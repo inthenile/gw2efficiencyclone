@@ -1,0 +1,60 @@
+
+.add-button{
+border-radius: 10px;
+}
+
+.up-button, .down-button{
+    width: 2em;;
+    height: 2em;
+    margin: 0 3px;
+}
+
+.make-main-button{
+    background-color: aqua;
+}
+
+.delete-button{
+    background-color: red;
+
+}
+
+/* HOVER ELEMENTS */
+button:hover{
+    cursor: pointer;
+}
+
+.up-button:hover, .down-button:hover{
+    color: var(--primary);
+    border-color: var(--primary);
+}
+.add-button:hover{
+}
+
+.li-element{
+    padding: 0 20px;
+}
+.api-key-span{
+    display: inline-block;
+    min-width: 220px;
+    text-align: center;
+}
+
+.api-container, .add-new-api{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.api-container ol{
+
+}
+.api-container ol{
+    
+}
+.api-key-span{
+
+}
+
+.add-new-api input{
+    margin: 20px 0;
+    width: 500px;
+}

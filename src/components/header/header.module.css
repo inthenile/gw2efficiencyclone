@@ -1,0 +1,11 @@
+.header-container{
+text-align: center;
+}
+.api-keys{
+color: var(--primary);
+}
+.api-keys:hover{
+    cursor: pointer;
+    text-decoration: underline;
+    color: var(--link);
+}

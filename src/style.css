@@ -1,0 +1,12 @@
+:root{
+    --primary: #627fff;
+    --link:  rgb(91, 0, 236);
+}
+a{
+    text-decoration: none;
+    color: var(--primary);
+}
+a:hover{
+    text-decoration: underline;
+    color: var(--link);
+}
