@@ -1,21 +1,41 @@
 
 .add-button{
 border-radius: 10px;
+width: 150px;
+height: 25px;
 }
 
+.api-key-active, .api-key-inactive{
+    display: inline-block;
+    min-width: 220px;
+    text-align: center;
+}
+
+.api-key-active{
+    color: green;
+    font-weight: bold;
+}
 .up-button, .down-button{
     width: 2em;;
     height: 2em;
     margin: 0 3px;
 }
 
-.make-main-button{
-    background-color: aqua;
+.delete-button{
+    width: 50px;
+    margin: 0 10px;
+    padding: 5px;
+}
+
+.make-main-inactive{
+    opacity: 0;
 }
 
 .delete-button{
-    background-color: red;
-
+    display: inline-block;
+    background-color: rgb(233, 0, 58);
+    border: none;
+    padding: 5px;
 }
 
 /* HOVER ELEMENTS */
@@ -23,20 +43,21 @@ button:hover{
     cursor: pointer;
 }
 
-.up-button:hover, .down-button:hover{
+.up-button:hover,
+.down-button:hover,
+.add-button:hover,
+.make-main-active:hover{
     color: var(--primary);
     border-color: var(--primary);
 }
-.add-button:hover{
+.make-main-inactive:hover{
+    cursor: default;
 }
+
 
 .li-element{
     padding: 0 20px;
-}
-.api-key-span{
-    display: inline-block;
-    min-width: 220px;
-    text-align: center;
+    margin-top: 10px;
 }
 
 .api-container, .add-new-api{
@@ -44,17 +65,52 @@ button:hover{
     flex-direction: column;
     align-items: center;
 }
-.api-container ol{
-
-}
-.api-container ol{
-    
-}
-.api-key-span{
-
-}
-
 .add-new-api input{
     margin: 20px 0;
     width: 500px;
+    height: 25px;
 }
+
+/* Extra small devices (phones, 600px and down) */
+@media only screen and (max-width: 600px) {
+    .api-container{
+        margin: auto;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .add-new-api input{
+        max-width: 200px;
+    }
+
+    .api-container button, .api-container span{
+        display: inline;
+    }
+    .api-container span{
+        width: 500px;
+    }
+    .api-container li{
+        padding: 0;
+        flex-direction: row;
+    }
+    .make-main-active{
+        display: inline-block;
+        margin: 0 3px;
+    }
+    .delete-button{
+        margin: 0 3px;
+    }
+}
+
+/* Small devices (portrait tablets and large phones, 600px and up) */
+/* @media only screen and (min-width: 600px) {    
+} */
+
+/* Medium devices (landscape tablets, 768px and up) */
+/* @media only screen and (min-width: 768px) {} */
+
+/* Large devices (laptops/desktops, 992px and up) */
+/* @media only screen and (min-width: 992px) {} */
+
+/* Extra large devices (large laptops and desktops, 1200px and up) */
+/* @media only screen and (min-width: 1200px) {} */

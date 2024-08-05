@@ -1,12 +1,22 @@
 :root{
     --primary: #627fff;
+    --secondary: #FFCC01;
     --link:  rgb(91, 0, 236);
 }
+*{
+    font-family: 'Franklin Gothic', 'Arial Narrow', Arial, sans-serif;
+}
+
 a{
     text-decoration: none;
     color: var(--primary);
 }
 a:hover{
+    cursor: pointer;
     text-decoration: underline;
     color: var(--link);
 }
+@media only screen and (min-width: 768px) {body{
+    width: 70%;
+    margin: 0 auto;
+}}

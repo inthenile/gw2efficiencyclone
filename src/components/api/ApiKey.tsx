@@ -31,7 +31,7 @@ function handleDeleteApiKey(index: number): void {
     if(confirm("Are you sure you want to delete this key?")){
         let newArray = apiKeys.filter((_, i) => i !== index);
         setApiKeys(newArray);
-            if(newArray.length > 0){
+            if(newArray.length > 0 && apiKeys[index].mainKey){
                 newArray.map((k) => {
                     k.mainKey = false;
                 })
@@ -85,9 +85,23 @@ function handleMakeMainKey(index: number): void{
                     <button className={styles["up-button"]} onClick={()=> handleMoveUp(index)}>⬆</button>
                     {/*Move BUTTON down*/}
                     <button className={styles["down-button"]} onClick={()=> handleMoveDown(index)}>⬇</button>
-                    <span className={styles["api-key-span"]}> {apiKey?.key.slice(0,20).concat("...")} </span>
+
+                    <span 
+                        className={ apiKey.mainKey === true 
+                        ? styles["api-key-active"] 
+                        : styles["api-key-inactive"] } 
+                    > {apiKey?.key.slice(0,15).concat("...")} </span>
+                    
                     {/*USE THIS API KEY BUTTON*/}
-                    {apiKey.mainKey === false && <button className={styles["make-main-button"]} onClick={()=> handleMakeMainKey(index)}> Use </button>}
+                    {<button 
+                    className={ apiKey.mainKey === false 
+                    ? styles["make-main-active"] 
+                    : styles["make-main-inactive"] } 
+                    onClick={()=> handleMakeMainKey(index)}
+                    disabled= {apiKey.mainKey === true 
+                        ? true 
+                        : false}
+                    > Use </button>}
                     {/*DELETE BUTTON*/}
                     <button className={styles["delete-button"]} onClick={()=> handleDeleteApiKey(index)}>Delete</button>
                 </li> )}
@@ -95,7 +109,7 @@ function handleMakeMainKey(index: number): void{
             </div>
             
             <div className={styles["add-new-api"]}>
-                <input type="text" name="api-adder" id="api-adder" />
+                <input type="text" placeholder="Enter your API key" name="api-adder" id="api-adder" />
                 {/*ADD BUTTON*/}
                 <button className={styles["add-button"]} onClick={() => handleAddNewKey()}>Add New Key</button>
             </div>

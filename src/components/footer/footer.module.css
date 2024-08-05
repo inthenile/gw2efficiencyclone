@@ -1,3 +1,63 @@
+.about, .socials{
+    display: flex;
+    flex-direction: column;
+}
 .footer-container{
+    gap: 10px;
     text-align: center;
+    display: grid;
+    margin-top: 50px;
+}
+.footer-container h4{
+    margin: 0;
+    padding: 0;
+}
+.footer-container div{
+    padding: 5px;
+    text-align: left;
+}
+.socials a{
+    margin-top:  16px;
+}
+.footer-container button{
+    background-color: var(--primary);
+    color: white;
+    height: 35px;
+    width: 150px;
+    border: none;
+    font-weight: 300;
+}
+.footer-container button:hover{
+    background-color: rgb(99, 70, 226);
+}
+/* Extra small devices (phones, 600px and down) */
+@media only screen and (max-width: 600px) {
+    .footer-container{
+
+        grid-template-columns: 1fr ;
+    }
+}
+
+/* Small devices (portrait tablets and large phones, 600px and up) */
+@media only screen and (min-width: 600px) {
+
+}
+
+/* Medium devices (landscape tablets, 768px and up) */
+@media only screen and (min-width: 768px) {
+    .footer-container{
+        grid-template-columns: 1fr 1fr ;
+    }
+}
+
+/* Large devices (laptops/desktops, 992px and up) */
+@media only screen and (min-width: 992px) {
+
+}
+
+/* Extra large devices (large laptops and desktops, 1200px and up) */
+@media only screen and (min-width: 1200px) {
+    .footer-container{
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+    }
 }
