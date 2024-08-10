@@ -1,27 +1,37 @@
 import { useEffect, useState } from "react";
 import type { ApiKeyType } from "./apitype";
 import styles from "./apiKey.module.css"; 
+import useValidateKey from "../../hooks/useValidateKey";
+
 const ApiKey = ({savedKeys} : {savedKeys: ApiKeyType[] | null}) => {
-    
 const [apiKeys, setApiKeys] = useState<ApiKeyType[]> (savedKeys ? savedKeys : [])
 const [isMainKey, setIsMainKey] = useState (false)
+const [keyToAdd, setKeyToAdd] = useState<ApiKeyType>({key:"",mainKey:false})
+
+const {isValid, err, fetchedData} = useValidateKey(keyToAdd);
 
 useEffect(() => {
-//local storage logics
+        //local storage logics  
         const apiKeyList = JSON.stringify(apiKeys);
         localStorage.setItem("savedKeys", apiKeyList);
-        
-},[handleAddNewKey])
+},[apiKeys, isMainKey, fetchedData])
+
+useEffect(()=>{
+//check if the key is a valid API KEY
+if (keyToAdd.key.length > 0 && isValid === true) {
+    setApiKeys(a => [...a, keyToAdd]);
+}
+console.log(fetchedData);
+
+}, [isValid])
 
 function handleAddNewKey(): void {
-
     let inputValue = (document.getElementById("api-adder") as HTMLInputElement).value;
     //10 api key limit
     if (apiKeys.length < 10 && inputValue.length > 0){
-        let keyToAdd: ApiKeyType;
         //first key will be the main key
-        apiKeys.length === 0 ? keyToAdd = {key: inputValue, mainKey: true} : keyToAdd = {key: inputValue, mainKey: false};
-        setApiKeys(a => [...a, keyToAdd]);
+        apiKeys.length === 0 ? setKeyToAdd({key: inputValue, mainKey:true}) : setKeyToAdd(({key: inputValue, mainKey:false}));
+        //the bug is that validKey variable is always one step behind.
         (document.getElementById("api-adder") as HTMLInputElement).value = "";
     } else if (apiKeys.length === 10){
         alert("You can have a maximum of 10 API Keys. Delete some.");
@@ -79,6 +89,7 @@ function handleMakeMainKey(index: number): void{
         <>
             <div className={styles["api-container"]}>
                 <h2>Your API Keys</h2>
+                {err && <h4>"This API key is invalid. Please check it and re-enter."</h4>}
                 <ol>
                 {apiKeys.map((apiKey, index) => <li className={styles["li-element"]} key={index}>
                     {/*Move BUTTON up*/}
@@ -111,7 +122,7 @@ function handleMakeMainKey(index: number): void{
             <div className={styles["add-new-api"]}>
                 <input type="text" placeholder="Enter your API key" name="api-adder" id="api-adder" />
                 {/*ADD BUTTON*/}
-                <button className={styles["add-button"]} onClick={() => handleAddNewKey()}>Add New Key</button>
+                <button className={styles["add-button"]} onClick={() => handleAddNewKey()} >Add New Key</button>
             </div>
         </>
     );

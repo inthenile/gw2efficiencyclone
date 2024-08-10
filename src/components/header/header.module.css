@@ -4,15 +4,24 @@ text-align: center;
 body{
     position: relative;
 }
-.header-container span{
+.header-container span:first-of-type{
     display: block;
     position: absolute;
     right: 20px;
     top: 20px;
 }
+
+/* ADJUST FOR MOBILE */
+
+.header-container span:nth-of-type(2){
+    position: absolute;
+    right: 20px;
+    top: 50px;
+}
 img{
     width: 40%;
 }
+
 .api-keys{
 color: var(--primary);
 }
@@ -28,6 +37,13 @@ color: var(--primary);
         margin-top: 80px;
         font-size: 1.2em;
     }
+    h3{
+        display: none;
+    }
+    img{
+        width: 80%;
+        margin-top: 100px;
+    }
 }
 
 /* Small devices (portrait tablets and large phones, 600px and up) */
@@ -36,6 +52,7 @@ color: var(--primary);
         margin-top: 40px;
         font-size: 1.6em;
     }
+    
 }
 
 /* Medium devices (landscape tablets, 768px and up) */

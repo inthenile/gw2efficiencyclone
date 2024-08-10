@@ -11,3 +11,5 @@ This is an update to the initial <a href="https://github.com/inthenile/gw2api">G
 3- npm install -> npm run dev
 4- Save your api key and use the search options!
 ```
+
+

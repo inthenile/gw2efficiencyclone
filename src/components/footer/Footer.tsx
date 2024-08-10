@@ -20,8 +20,8 @@ const Footer = () => {
 
             <div className={styles["socials"]}>
                 <h4>Find me on the internet</h4>
-                <a target="blank_" href="https://github.com/inthenile">GitHub</a>
-                <a target="blank_" href="https://www.linkedin.com/in/salim-caliskan-724811273/">LinkedIn</a>
+                <a target="_blank" href="https://github.com/inthenile">GitHub</a>
+                <a target="_blank" href="https://www.linkedin.com/in/salim-caliskan-724811273/">LinkedIn</a>
             </div>
 
             <div className={styles["about"]}>

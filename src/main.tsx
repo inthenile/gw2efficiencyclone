@@ -3,7 +3,7 @@ import App from './App.tsx'
 import { StrictMode } from 'react'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-      <StrictMode>
+      // <StrictMode>
             <App />
-      </StrictMode>            
+      // </StrictMode>            
 )
