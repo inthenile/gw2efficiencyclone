@@ -6,7 +6,7 @@ import useValidateKey from "../../hooks/useValidateKey";
 const ApiKey = ({savedKeys} : {savedKeys: ApiKeyType[] | null}) => {
 const [apiKeys, setApiKeys] = useState<ApiKeyType[]> (savedKeys ? savedKeys : [])
 const [isMainKey, setIsMainKey] = useState (false)
-const [keyToAdd, setKeyToAdd] = useState<ApiKeyType>({key:"",mainKey:false})
+const [keyToAdd, setKeyToAdd] = useState<ApiKeyType>({key:"", mainKey:false})
 
 const {isValid, err, fetchedData} = useValidateKey(keyToAdd);
 
@@ -14,22 +14,23 @@ useEffect(() => {
         //local storage logics  
         const apiKeyList = JSON.stringify(apiKeys);
         localStorage.setItem("savedKeys", apiKeyList);
-},[apiKeys, isMainKey, fetchedData])
+},[apiKeys, isMainKey])
 
 useEffect(()=>{
-//check if the key is a valid API KEY
+//check if the key is a valid API KEY, if it is, fetch the account name and add it to our apiKeytype, and then save it;
 if (keyToAdd.key.length > 0 && isValid === true) {
-    setApiKeys(a => [...a, keyToAdd]);
+    const fullKeyInfo: ApiKeyType = {key: keyToAdd.key, accountName: fetchedData.name, mainKey: keyToAdd.mainKey};
+    setApiKeys(a => [...a, fullKeyInfo]);    
 }
-console.log(fetchedData);
+}, [fetchedData])
 
-}, [isValid])
 
 function handleAddNewKey(): void {
     let inputValue = (document.getElementById("api-adder") as HTMLInputElement).value;
     //10 api key limit
     if (apiKeys.length < 10 && inputValue.length > 0){
         //first key will be the main key
+
         apiKeys.length === 0 ? setKeyToAdd({key: inputValue, mainKey:true}) : setKeyToAdd(({key: inputValue, mainKey:false}));
         //the bug is that validKey variable is always one step behind.
         (document.getElementById("api-adder") as HTMLInputElement).value = "";

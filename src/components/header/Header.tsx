@@ -1,6 +1,7 @@
 import styles from "./header.module.css";
 import logo from "../../assets/logo.png"
 import { ApiKeyType } from "../api/apitype";
+import { useEffect, useState } from "react";
 
 const Header = ({handleApiClick = () => {},
                 handleLogoClick = () => {},
@@ -9,27 +10,36 @@ const Header = ({handleApiClick = () => {},
                 {handleApiClick: React.MouseEventHandler,
                 handleLogoClick: React.MouseEventHandler,
                 keyArray: ApiKeyType[]})  => {
+    
 
-                    keyArray.map((key, index) => {
-                        console.log(key, index);
-                        
-                    })
+    const [optionChange, setOptionChange] = useState(false)
+    const handleOptionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        console.log(e.target.value);
+        setOptionChange(!optionChange);
+    }
+
+    //run this when the a new api key option is swapped
+    useEffect(() => {
+        console.log("option changed");
+        
+    }, [optionChange])
+
     return ( 
-        <>
             <div className={styles["header-container"]}>
                 <img src={logo} alt="gw2 efficiency logo" onClick={handleLogoClick} id="gw2e-logo"/>
                 <span className={styles["api-keys"]} onClick={handleApiClick}>API Keys</span>
 
-                <span className="select-account"> Account: <select>
+                <span className="select-account"> Account: <select onChange={(e) => handleOptionChange(e)}>
 
-                <option value=""></option>
+                {keyArray && keyArray.map((key, index) => (
+                    <option key={index} value={key.key}>{key.accountName}</option>
+                ))}
                 </select>
+                
                 </span>
-
-                <h3>Scuffed <a target="blank_" href="https://gw2efficiency.com/">gw2efficiency.com</a> clone</h3>
-                <h4>Developed by <a target="blank_" href="https://github.com/inthenile">inthenile</a></h4>
+                <h3>Scuffed <a target="_blank" href="https://gw2efficiency.com/">gw2efficiency.com</a> clone</h3>
+                <h4>Developed by <a target="_blank" href="https://github.com/inthenile">inthenile</a></h4>
             </div>
-        </>
      );
 }
  

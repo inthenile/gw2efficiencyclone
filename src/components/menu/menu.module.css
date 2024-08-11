@@ -1,0 +1,24 @@
+.menuIcons{
+    display: flex;
+    justify-content: center;    
+    text-align: center;
+    gap: 20px;
+
+}
+.menuIcons span{
+display: flex;
+align-items: center;
+}
+.menuIcons span:hover{
+    cursor: pointer;    
+}
+.menuIcons img{
+    width: 46px;
+    height: 46px;
+}
+.inactive{
+    opacity: 60%;
+}
+.active{
+    opacity: 100%;
+}
