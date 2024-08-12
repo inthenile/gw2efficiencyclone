@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import type { ApiKeyType } from "./apitype";
+import { ApiKeyType } from "./apitype";
 import styles from "./apiKey.module.css"; 
 import useValidateKey from "../../hooks/useValidateKey";
 
 const ApiKey = ({savedKeys} : {savedKeys: ApiKeyType[] | null}) => {
+
 const [apiKeys, setApiKeys] = useState<ApiKeyType[]> (savedKeys ? savedKeys : [])
 const [isMainKey, setIsMainKey] = useState (false)
 const [keyToAdd, setKeyToAdd] = useState<ApiKeyType>({key:"", mainKey:false})
@@ -14,6 +15,7 @@ useEffect(() => {
         //local storage logics  
         const apiKeyList = JSON.stringify(apiKeys);
         localStorage.setItem("savedKeys", apiKeyList);
+    
 },[apiKeys, isMainKey])
 
 useEffect(()=>{
@@ -32,6 +34,7 @@ function handleAddNewKey(): void {
         //first key will be the main key
 
         apiKeys.length === 0 ? setKeyToAdd({key: inputValue, mainKey:true}) : setKeyToAdd(({key: inputValue, mainKey:false}));
+        
         //the bug is that validKey variable is always one step behind.
         (document.getElementById("api-adder") as HTMLInputElement).value = "";
     } else if (apiKeys.length === 10){

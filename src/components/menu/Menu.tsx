@@ -7,10 +7,15 @@ import lotteryIcon from "../../assets/lottery-icon.png";
 import statsIcon from "../../assets/stats-icon.png";
 import goldCoinIcon from "../../assets/gold-coin-icon.png";
 import styles from "./menu.module.css"
-import { useState } from "react";
+import { useContext, useState } from "react";
+import useFetch from "../../hooks/useFetch";
+import { KeyArrayContext } from "../../App";
 
 const Menu = () => {
 
+    const keyContext = useContext(KeyArrayContext)
+    console.log(keyContext);
+    
     const [menuIcons, setMenuIcons] = useState([
         <span ><img src={dailyIcon}/>Dailies</span> ,
         <span ><img src={accountIcon} />Account</span>,
@@ -22,9 +27,12 @@ const Menu = () => {
         <span ><img src={lotteryIcon} />Lottery</span>,
     ])
         
+
     const handleMenuLogoClick = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
         console.log(e.currentTarget);
-        
+        if (keyContext) {
+            useFetch(keyContext[0]);
+        }
     }
 
     return ( 
