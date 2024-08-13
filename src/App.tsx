@@ -1,22 +1,28 @@
-import { createContext, useContext, useState } from "react";
+import React, { createContext, useState } from "react";
 import { ApiKeyType } from "./components/api/apitype.tsx";
 import Footer from "./components/footer/Footer.tsx"
 import Header from "./components/header/Header.tsx"
 import ApiKey from "./components/api/ApiKey.tsx";
 import Menu from "./components/menu/Menu.tsx";
 
-const savedKeys = localStorage.getItem("savedKeys");
+type StateContextType = {
+  keyArray: ApiKeyType[];
+  setKeyArray: React.Dispatch<React.SetStateAction<ApiKeyType[]>>;
+}
 
-const keyArray: ApiKeyType[] = savedKeys ? JSON.parse(savedKeys) : [];
-
-export const KeyArrayContext = createContext<null | ApiKeyType[]>(keyArray);
+export const KeyArrayContext = createContext<null | StateContextType>(null);
 
 type ContextProviderProps = {
   children: React.ReactNode;
 };
 
 export const ContextProvider = ({children} : ContextProviderProps) => {
-  const value = keyArray;
+  const [keyArray, setKeyArray] = useState<ApiKeyType[]>([]);
+  const value = {
+    keyArray,
+    setKeyArray
+  };
+
   return (
   <KeyArrayContext.Provider value={value}> 
     {children}
@@ -26,9 +32,8 @@ export const ContextProvider = ({children} : ContextProviderProps) => {
 
 
 function App() {
-  
+
 const [showApi, setShowApi] = useState(false);
-  
 
   function handleApiClick(){
     setShowApi(!showApi)
@@ -45,16 +50,13 @@ const [showApi, setShowApi] = useState(false);
     }
   }
 
-
-
-
   return (
     <>
       
       <ContextProvider>
         <>
-          <Header handleApiClick={handleApiClick} handleLogoClick={handleLogoClick} keyArray={keyArray}/>
-          {showApi && <ApiKey savedKeys={keyArray}/>}
+          <Header handleApiClick={handleApiClick} handleLogoClick={handleLogoClick} />
+          {showApi && <ApiKey />}
           <Menu />
         </>
       </ContextProvider>

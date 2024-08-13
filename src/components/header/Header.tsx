@@ -1,16 +1,17 @@
 import styles from "./header.module.css";
 import logo from "../../assets/logo.png"
-import { ApiKeyType } from "../api/apitype";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { KeyArrayContext } from "../../App";
 
 const Header = ({handleApiClick = () => {},
                 handleLogoClick = () => {},
-                keyArray,
                 } :
                 {handleApiClick: React.MouseEventHandler,
                 handleLogoClick: React.MouseEventHandler,
-                keyArray: ApiKeyType[]})  => {
+                })  => {
     
+    const keyContext = useContext(KeyArrayContext);
+    const keyArray = keyContext?.keyArray;
 
     const [optionChange, setOptionChange] = useState(false)
     const handleOptionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {

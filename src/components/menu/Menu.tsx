@@ -29,9 +29,11 @@ const Menu = () => {
         
 
     const handleMenuLogoClick = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
+        
         console.log(e.currentTarget);
-        if (keyContext) {
-            useFetch(keyContext[0]);
+
+        if (keyContext?.keyArray.length) {
+            useFetch(keyContext.keyArray[0]);
         }
     }
 

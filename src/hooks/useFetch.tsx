@@ -1,13 +1,11 @@
 //this custom hook will fetch data from gw2 api endpoints
 import { ApiEndpoints } from "../components/api/ApiEndpoints";
+import { ApiKeyType } from "../components/api/apitype";
 
 const endPoint = ApiEndpoints.account;
 const baseUrl = "https://api.guildwars2.com/";
 
-//any for now. I will fix this to accept apikeys only afterwards
-const useFetch = (currentApiKey: any) => {
-
- 
+const useFetch = (currentApiKey: ApiKeyType) => {
 
 fetch(`${baseUrl}${endPoint}?access_token=${currentApiKey.key}`)
 
