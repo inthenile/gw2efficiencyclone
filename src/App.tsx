@@ -11,6 +11,7 @@ type StateContextType = {
 }
 const savedKeys = localStorage.getItem("savedKeys");
 const keys: ApiKeyType[] = savedKeys ? JSON.parse(savedKeys) : [];
+
 export const KeyArrayContext = createContext<null | StateContextType>(null);
 
 type ContextProviderProps = {

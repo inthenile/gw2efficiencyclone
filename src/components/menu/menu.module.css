@@ -2,8 +2,8 @@
     display: flex;
     justify-content: center;    
     text-align: center;
+    flex-wrap: wrap;
     gap: 20px;
-
 }
 .menuIcons span{
 display: flex;
@@ -20,5 +20,10 @@ align-items: center;
     opacity: 60%;
 }
 .active{
+    opacity: 100%;
+    text-decoration: underline;
+
+}
+.inactive:hover{
     opacity: 100%;
 }
