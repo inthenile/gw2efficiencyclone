@@ -9,7 +9,8 @@ type StateContextType = {
   keyArray: ApiKeyType[];
   setKeyArray: React.Dispatch<React.SetStateAction<ApiKeyType[]>>;
 }
-
+const savedKeys = localStorage.getItem("savedKeys");
+const keys: ApiKeyType[] = savedKeys ? JSON.parse(savedKeys) : [];
 export const KeyArrayContext = createContext<null | StateContextType>(null);
 
 type ContextProviderProps = {
@@ -17,7 +18,7 @@ type ContextProviderProps = {
 };
 
 export const ContextProvider = ({children} : ContextProviderProps) => {
-  const [keyArray, setKeyArray] = useState<ApiKeyType[]>([]);
+  const [keyArray, setKeyArray] = useState<ApiKeyType[]>(keys);
   const value = {
     keyArray,
     setKeyArray
