@@ -7,45 +7,56 @@ import lotteryIcon from "../../assets/lottery-icon.png";
 import statsIcon from "../../assets/stats-icon.png";
 import goldCoinIcon from "../../assets/gold-coin-icon.png";
 import styles from "./menu.module.css"
-import { ReactElement, useContext, useState } from "react";
+import { ReactElement, useContext, useEffect, useState } from "react";
 import useFetch from "../../hooks/useFetch";
 import { KeyArrayContext } from "../../App";
+import { EndpointType } from "../../endpoints/endpointtype";
+import { wizVaultDaily, accountInfo, worldBosses} from "../../endpoints/accountInfo/accointInfo";
+import { currencyInfo } from "../../endpoints/currencyInfo/currencies";
+import { charactersInfo } from "../../endpoints/charactersInfo/charactersInfo";
+
 
 const Menu = () => {
 
     const keyContext = useContext(KeyArrayContext)
-    
+
     type MenuIcon = {
         element: ReactElement,
         activeState: boolean
+        endPoint: EndpointType
     }
 
     const [menuIcons, setMenuIcons] = useState<MenuIcon[]>([
-        {element: <span><img src={dailyIcon}/>Dailies</span>, activeState: false},
-        {element: <span><img src={accountIcon} />Account</span>, activeState: false},
-        {element: <span><img src={statsIcon} />Stats</span>, activeState: false},
-        {element: <span><img src={bossIcon} />Bosses</span>, activeState: false},
-        {element: <span><img src={disciplinesIcon} />Crafting</span>, activeState: false},
-        {element: <span><img src={activitiesIcon} />Activities</span>, activeState: false},
-        {element: <span><img src={goldCoinIcon} />Currencies</span>, activeState: false},
-        {element: <span><img src={lotteryIcon} />Lottery</span>,  activeState: false},
-    ])
         
+        {element: <span><img src={dailyIcon}/>Dailies</span>, activeState: false, endPoint: wizVaultDaily},
+        {element: <span><img src={accountIcon} />Account</span>, activeState: false, endPoint: accountInfo},
+        {element: <span><img src={statsIcon} />Stats</span>, activeState: false, endPoint: charactersInfo},
+        {element: <span><img src={bossIcon} />Bosses</span>, activeState: false, endPoint: worldBosses},
+        {element: <span><img src={goldCoinIcon} />Currencies</span>, activeState: false, endPoint: currencyInfo},
+        //these three are placeholders
+        {element: <span><img src={disciplinesIcon} />Crafting</span>, activeState: false, endPoint: wizVaultDaily},
+        {element: <span><img src={activitiesIcon} />Activities</span>, activeState: false, endPoint: wizVaultDaily},
+        {element: <span><img src={lotteryIcon} />Lottery</span>,  activeState: false, endPoint: wizVaultDaily},
+    ])
+
+    //make different component(s) for submenus?
+
+    useEffect(() =>{
+
+    }, [menuIcons])
 
     const handleMenuLogoClick = (index: number) => {
 
         setMenuIcons(menuIcons.map((icon, i) =>{
             if(index === i){
-                console.log(icon.activeState);
                 return {...icon, activeState: true};
             } else {
                 return {...icon, activeState: false};
             }
         }));
-        console.log(menuIcons);
-        
+
         if (keyContext?.keyArray.length) {
-            useFetch(keyContext.keyArray[0])
+            useFetch(keyContext.keyArray[0], menuIcons[index].endPoint )
         }
     }
 

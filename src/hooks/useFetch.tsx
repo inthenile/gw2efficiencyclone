@@ -1,16 +1,21 @@
 //this custom hook will fetch data from gw2 api endpoints
-import { ApiEndpoints } from "../components/api/ApiEndpoints";
 import { ApiKeyType } from "../components/api/apitype";
+import { EndpointType } from "../endpoints/endpointtype";
 
-const endPoint = ApiEndpoints.account;
-const baseUrl = "https://api.guildwars2.com/";
+const baseUrl = "https://api.guildwars2.com";
 
-const useFetch = (currentApiKey: ApiKeyType) => {
+const useFetch = (currentApiKey: ApiKeyType, endpoint: EndpointType) => {
 
-fetch(`${baseUrl}${endPoint}?access_token=${currentApiKey.key}`)
+    const fetchLink = endpoint.keyReq 
+    ? 
+    `${baseUrl}${endpoint.url}?access_token=${currentApiKey.key}`
+    :
+    `${baseUrl}${endpoint.url}`
+    console.log(fetchLink)
+
+fetch(fetchLink)
 
     .then((res) =>{
-console.log(`${baseUrl}${endPoint}?access_token=${currentApiKey.key}`)
 
         return res.json();
     }).then((data) =>{
