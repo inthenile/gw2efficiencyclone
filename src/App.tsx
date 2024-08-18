@@ -5,12 +5,16 @@ import Header from "./components/header/Header.tsx"
 import ApiKey from "./components/api/ApiKey.tsx";
 import Menu from "./components/menu/Menu.tsx";
 
+
+const savedKeys = localStorage.getItem("savedKeys");
+const keys: ApiKeyType[] = savedKeys ? JSON.parse(savedKeys) : [];
+
 type StateContextType = {
   keyArray: ApiKeyType[];
   setKeyArray: React.Dispatch<React.SetStateAction<ApiKeyType[]>>;
+  isMainKey: ApiKeyType;
+  setIsMainKey: React.Dispatch<React.SetStateAction<ApiKeyType>>;
 }
-const savedKeys = localStorage.getItem("savedKeys");
-const keys: ApiKeyType[] = savedKeys ? JSON.parse(savedKeys) : [];
 
 export const KeyArrayContext = createContext<null | StateContextType>(null);
 
@@ -18,11 +22,21 @@ type ContextProviderProps = {
   children: React.ReactNode;
 };
 
+const selectedKey = keys.filter(k => {
+  if (k.mainKey) {
+    return k;
+  }
+})
+
 export const ContextProvider = ({children} : ContextProviderProps) => {
   const [keyArray, setKeyArray] = useState<ApiKeyType[]>(keys);
+  const [isMainKey, setIsMainKey] = useState<ApiKeyType>(selectedKey[0])
+
   const value = {
     keyArray,
-    setKeyArray
+    setKeyArray,
+    isMainKey,
+    setIsMainKey,
   };
 
   return (
@@ -31,7 +45,6 @@ export const ContextProvider = ({children} : ContextProviderProps) => {
   </KeyArrayContext.Provider>
   )
 }
-
 
 function App() {
 

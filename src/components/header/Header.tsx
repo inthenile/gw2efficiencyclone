@@ -1,7 +1,8 @@
 import styles from "./header.module.css";
 import logo from "../../assets/logo.png"
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
 import { KeyArrayContext } from "../../App";
+import { ApiKeyType } from "../api/apitype";
 
 const Header = ({handleApiClick = () => {},
                 handleLogoClick = () => {},
@@ -11,32 +12,51 @@ const Header = ({handleApiClick = () => {},
                 })  => {
     
     const keyContext = useContext(KeyArrayContext);
-    const keyArray = keyContext?.keyArray;
+    const savedKeys = keyContext?.keyArray;
+    const mainKey = keyContext?.isMainKey;
+    const setMainKey = keyContext?.setIsMainKey;
 
-    const [optionChange, setOptionChange] = useState(false)
+    let selectedKey: ApiKeyType[];
+
     const handleOptionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        console.log(e.target.value);
-        setOptionChange(!optionChange);
+        
+        savedKeys?.map((key) => {
+            key.mainKey = false;
+        })
+        
+        if (setMainKey && mainKey && savedKeys) {
+            setMainKey({key: e.target.value, mainKey:true});
+            
+        }
+        //update the selected key value on both the key table as well as the dropdown menu
+        if (savedKeys) {
+        
+        selectedKey = savedKeys?.filter(k => {
+            if(k.key === e.target.value){
+                return k;
+            }
+        })
+        selectedKey[0].mainKey = true;
+        }
     }
 
-    //run this when the a new api key option is swapped
     useEffect(() => {
-        console.log("option changed");
+      
+        const apiKeyList = JSON.stringify(savedKeys);
+        localStorage.setItem("savedKeys", apiKeyList);
         
-    }, [optionChange])
+},[savedKeys, mainKey])
 
     return ( 
             <div className={styles["header-container"]}>
                 <img src={logo} alt="gw2 efficiency logo" onClick={handleLogoClick} id="gw2e-logo"/>
                 <span className={styles["api-keys"]} onClick={handleApiClick}>API Keys</span>
-
-                <span className="select-account"> Account: <select onChange={(e) => handleOptionChange(e)}>
-
-                {keyArray && keyArray.map((key, index) => (
-                    <option key={index} value={key.key}>{key.accountName}</option>
-                ))}
-                </select>
-                
+                <span className="select-account"> Account: 
+                        <select id="select" onChange={(e) => handleOptionChange(e)} defaultValue={mainKey?.key} >
+                    {savedKeys && savedKeys.map((key, index) => (
+                        <option key={index} value={key.key}> {key.accountName} </option>
+                    ))}
+                    </select>
                 </span>
                 <h3>Scuffed <a target="_blank" href="https://gw2efficiency.com/">gw2efficiency.com</a> clone</h3>
                 <h4>Developed by <a target="_blank" href="https://github.com/inthenile">inthenile</a></h4>

@@ -4,21 +4,29 @@ import styles from "./apiKey.module.css";
 import useValidateKey from "../../hooks/useValidateKey";
 import { KeyArrayContext } from "../../App";
 
+
 const ApiKey = () => {
+
 
 const keyContext = useContext(KeyArrayContext);
 const savedKeys = keyContext?.keyArray;
-const [isMainKey, setIsMainKey] = useState (false)
-const [keyToAdd, setKeyToAdd] = useState<ApiKeyType>({key:"", mainKey:false})
 
+const mainKey = keyContext?.isMainKey;
+const setMainKey = keyContext?.setIsMainKey;
+
+
+const [keyToAdd, setKeyToAdd] = useState<ApiKeyType>({key:"", mainKey:false})
 const {isValid, err, fetchedData} = useValidateKey(keyToAdd);
 
 useEffect(() => {
         //local storage logics  
         const apiKeyList = JSON.stringify(savedKeys);
         localStorage.setItem("savedKeys", apiKeyList);
-    
-},[savedKeys, isMainKey])
+        if (mainKey) {
+            (document.getElementById("select") as HTMLInputElement).value = mainKey?.key;
+        }
+},[savedKeys, mainKey])
+
 
 useEffect(()=>{
 //check if the key is a valid API KEY, if it is, fetch the account name and add it to our apiKeytype, and then save it;
@@ -27,7 +35,6 @@ if (keyToAdd.key.length > 0 && isValid === true) {
     keyContext?.setKeyArray(a => [...a, fullKeyInfo]);
 }
 }, [fetchedData])
-
 
 function handleAddNewKey(): void {
     let inputValue = (document.getElementById("api-adder") as HTMLInputElement).value;
@@ -85,12 +92,12 @@ function handleMoveDown(index: number): void {
 function handleMakeMainKey(index: number): void{
     //make all other mainkey properties false before making another one true
     //this ensures there is only one mainKey property that is true.
-    if (savedKeys !== undefined ) {
+    if (savedKeys && setMainKey) {
         savedKeys.map((key) => {
             key.mainKey = false;
     })
-    setIsMainKey(!isMainKey);
-    savedKeys[index].mainKey = true;
+        setMainKey(savedKeys[index]);
+        savedKeys[index].mainKey = true;
     }
 }
     return ( 

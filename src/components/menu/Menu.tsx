@@ -7,7 +7,7 @@ import lotteryIcon from "../../assets/lottery-icon.png";
 import statsIcon from "../../assets/stats-icon.png";
 import goldCoinIcon from "../../assets/gold-coin-icon.png";
 import styles from "./menu.module.css"
-import { ReactElement, useContext, useEffect, useState } from "react";
+import { ReactElement, useContext,  useEffect,  useState } from "react";
 import useFetch from "../../hooks/useFetch";
 import { KeyArrayContext } from "../../App";
 import { EndpointType } from "../../endpoints/endpointtype";
@@ -15,16 +15,23 @@ import { wizVaultDaily, accountInfo, worldBosses} from "../../endpoints/accountI
 import { currencyInfo } from "../../endpoints/currencyInfo/currencies";
 import { charactersInfo } from "../../endpoints/charactersInfo/charactersInfo";
 
-
 const Menu = () => {
 
-    const keyContext = useContext(KeyArrayContext)
+    const keyContext = useContext(KeyArrayContext);
+    const mainKey = keyContext?.isMainKey;
 
     type MenuIcon = {
         element: ReactElement,
         activeState: boolean
-        endPoint: EndpointType
+        endPoint: EndpointType,
     }
+
+    useEffect(() => {
+        //reset the menu selection after a key is changed
+        setMenuIcons(menuIcons.map(icon => {
+            return {...icon, activeState: false};
+        }))
+    }, [mainKey])
 
     const [menuIcons, setMenuIcons] = useState<MenuIcon[]>([
         
@@ -41,10 +48,6 @@ const Menu = () => {
 
     //make different component(s) for submenus?
 
-    useEffect(() =>{
-
-    }, [menuIcons])
-
     const handleMenuLogoClick = (index: number) => {
 
         setMenuIcons(menuIcons.map((icon, i) =>{
@@ -55,8 +58,8 @@ const Menu = () => {
             }
         }));
 
-        if (keyContext?.keyArray.length) {
-            useFetch(keyContext.keyArray[0], menuIcons[index].endPoint )
+        if (mainKey && !menuIcons[index].activeState) {
+            useFetch(mainKey, menuIcons[index].endPoint )
         }
     }
 
