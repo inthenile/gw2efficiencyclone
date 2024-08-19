@@ -50,27 +50,13 @@ function App() {
 
 const [showApi, setShowApi] = useState(false);
 
-  function handleApiClick(){
-    setShowApi(!showApi)
-    if (!document.getElementById("gw2e-logo")?.classList.contains("active")) {
-      document.getElementById("gw2e-logo")?.classList.add("active");
-    } else {
-      document.getElementById("gw2e-logo")?.classList.remove("active");
-    }
-}
-  function handleLogoClick(){
-    if (showApi) {
-      setShowApi(false)
-      document.getElementById("gw2e-logo")?.classList.remove("active");
-    }
-  }
 
   return (
     <>
       
       <ContextProvider>
         <>
-          <Header handleApiClick={handleApiClick} handleLogoClick={handleLogoClick} />
+          <Header showApi={showApi} setShowApi={setShowApi} />
           {showApi && <ApiKey />}
           <Menu />
         </>

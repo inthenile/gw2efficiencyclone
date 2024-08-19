@@ -4,12 +4,7 @@ import { useContext, useEffect } from "react";
 import { KeyArrayContext } from "../../App";
 import { ApiKeyType } from "../api/apitype";
 
-const Header = ({handleApiClick = () => {},
-                handleLogoClick = () => {},
-                } :
-                {handleApiClick: React.MouseEventHandler,
-                handleLogoClick: React.MouseEventHandler,
-                })  => {
+const Header = ( {showApi, setShowApi} : {showApi: boolean, setShowApi: React.Dispatch<React.SetStateAction<boolean>>})  => {
     
     const keyContext = useContext(KeyArrayContext);
     const savedKeys = keyContext?.keyArray;
@@ -18,6 +13,21 @@ const Header = ({handleApiClick = () => {},
 
     let selectedKey: ApiKeyType[];
 
+    function handleApiClick(){
+        setShowApi(!showApi)
+        if (!document.getElementById("gw2e-logo")?.classList.contains("active")) {
+          document.getElementById("gw2e-logo")?.classList.add("active");
+        } else {
+          document.getElementById("gw2e-logo")?.classList.remove("active");
+        }
+    }
+      function handleLogoClick(){
+        if (showApi) {
+          setShowApi(false)
+          document.getElementById("gw2e-logo")?.classList.remove("active");
+        }
+      }
+    
     const handleOptionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         
         savedKeys?.map((key) => {
