@@ -10,6 +10,7 @@ const [isValid, setIsValid] = useState(false);
 const [err, setErr] = useState(false);
 const [fetchedData, setfetchedData] = useState<any>([]);
 const endPoint = "https://api.guildwars2.com/v2/account?access_token=";
+
 useEffect(()=>{
 
     if(apikey.key.length > 0){
@@ -37,7 +38,6 @@ useEffect(()=>{
         setfetchedData([]);
     }
 },[apikey])
-    
     return {isValid, err, fetchedData}
 }
  

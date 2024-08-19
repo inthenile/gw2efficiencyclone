@@ -1,5 +1,5 @@
 import styles from "./footer.module.css"
-import partnerlogo from "../../assets/partner-normal.png"
+import partnerlogo from "../../assets/menu/partner-normal.png"
 const Footer = () => {
 
     return ( 

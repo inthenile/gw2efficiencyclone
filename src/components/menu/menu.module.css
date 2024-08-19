@@ -5,11 +5,11 @@
     flex-wrap: wrap;
     gap: 20px;
 }
-.menuIcons span{
+.menuIcons span, .subMenuIcons span{
 display: flex;
 align-items: center;
 }
-.menuIcons span:hover{
+.menuIcons span:hover, .subMenuIcons:hover{
     cursor: pointer;    
 }
 .menuIcons img{
@@ -22,8 +22,20 @@ align-items: center;
 .active{
     opacity: 100%;
     text-decoration: underline;
-
 }
 .inactive:hover{
     opacity: 100%;
+}
+
+.subMenuIcons{
+        display: flex;
+        justify-content: center;    
+        text-align: center;
+        flex-wrap: wrap;
+        gap: 20px;
+}
+
+.subMenuIcons img{
+    width: 25px;
+    height: 25px;
 }

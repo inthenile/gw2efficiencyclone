@@ -1,5 +1,5 @@
 import styles from "./header.module.css";
-import logo from "../../assets/logo.png"
+import logo from "../../assets/menu/logo.png"
 import { useContext, useEffect } from "react";
 import { KeyArrayContext } from "../../App";
 import { ApiKeyType } from "../api/apitype";
@@ -68,7 +68,7 @@ const Header = ( {showApi, setShowApi} : {showApi: boolean, setShowApi: React.Di
                     ))}
                     </select>
                 </span>
-                <h3>Scuffed <a target="_blank" href="https://gw2efficiency.com/">gw2efficiency.com</a> clone</h3>
+                <h3><a target="_blank" href="https://gw2efficiency.com/">gw2efficiency.com</a> clone</h3>
                 <h4>Developed by <a target="_blank" href="https://github.com/inthenile">inthenile</a></h4>
             </div>
      );
