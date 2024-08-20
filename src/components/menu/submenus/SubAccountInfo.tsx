@@ -29,16 +29,19 @@ const SubAccountInfo = () => {
         {element: <span><img src={sharedInventoryIcon} /> Shared Inventory </span>, activeState: false, endPoint: sharedInventoryInfo},
     ])
 
-    const handleSubMenuLogoClick = (index: number) => {
-        
-        setSubMenuIcons(subMenuIcons.map((icon, i) =>{
-            if(index === i){
-                return {...icon, activeState: true};
-            } else {
-                return {...icon, activeState: false};
-            }
-        }));
-        
+
+
+
+        const handleSubMenuLogoClick = (index: number) => {
+
+            setSubMenuIcons(subMenuIcons.map((icon, i) =>{
+                if(index === i){
+                    return {...icon, activeState: true};
+                } else {
+                    return {...icon, activeState: false};
+                }
+            }));
+            
         if (mainKey && subMenuIcons[index].endPoint && !subMenuIcons[index].activeState) {
             useFetch(mainKey, subMenuIcons[index].endPoint )
         }

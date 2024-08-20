@@ -23,7 +23,7 @@ const Menu = () => {
     const [menuIcons, setMenuIcons] = useState<MenuIcon[]>([
         
         {element: <span><img src={dailyIcon}/>Dailies</span>, activeState: false, endPoint: wizVaultDaily},
-        {element: <span><img src={accountIcon} />Account</span>, activeState: false, endPoint: accountInfo, subMenu: SubAccountInfo()},
+        {element: <span><img src={accountIcon} />Account</span>, activeState: false, endPoint: accountInfo, subMenu: <SubAccountInfo />},
         {element: <span><img src={bossIcon} />Bosses</span>, activeState: false, endPoint: worldBosses},
         {element: <span><img src={goldCoinIcon} />Currencies</span>, activeState: false, endPoint: currencyInfo},
         //these are placeholders // might be worked on later
@@ -42,8 +42,8 @@ const Menu = () => {
     }, [mainKey])
 
 
-    const handleMenuLogoClick = (index: number) => {
 
+    const handleMenuLogoClick = (index: number) => {
         setMenuIcons(menuIcons.map((icon, i) =>{
             if(index === i){
                 return {...icon, activeState: true};
@@ -56,6 +56,8 @@ const Menu = () => {
             useFetch(mainKey, menuIcons[index].endPoint )
         }
     }
+
+
 
     return ( 
         <div className={styles.menuIcons}>
@@ -71,7 +73,7 @@ const Menu = () => {
             {menuIcons && menuIcons.map((icon, index) => (
                 icon.activeState === true 
                 ?
-                <div key={index}>{icon.subMenu}</div>
+                <div key={index} >{icon.subMenu}</div>
                 : 
                 null
             ))}
