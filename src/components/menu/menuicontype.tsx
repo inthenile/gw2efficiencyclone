@@ -1,4 +1,4 @@
-import { FC, ReactElement } from "react"
+import { ReactElement } from "react"
 import { EndpointType } from "../../endpoints/endpointtype"
 
 export type MenuIcon = {

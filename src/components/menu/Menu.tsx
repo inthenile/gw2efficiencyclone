@@ -19,14 +19,17 @@ const Menu = () => {
 
     const keyContext = useContext(KeyArrayContext);
     const mainKey = keyContext?.isMainKey;
-    
+    const [res, setRes] = useState<any>();
+    const [loading, setLoadiing] = useState(false);
+    const [err, setErr] = useState(false);
+
     const [menuIcons, setMenuIcons] = useState<MenuIcon[]>([
-        
+
         {element: <span><img src={dailyIcon}/>Dailies</span>, activeState: false, endPoint: wizVaultDaily},
         {element: <span><img src={accountIcon} />Account</span>, activeState: false, endPoint: accountInfo, subMenu: <SubAccountInfo />},
+        //these are placeholders
         {element: <span><img src={bossIcon} />Bosses</span>, activeState: false, endPoint: worldBosses},
         {element: <span><img src={goldCoinIcon} />Currencies</span>, activeState: false, endPoint: currencyInfo},
-        //these are placeholders // might be worked on later
         {element: <span><img src={statsIcon} />Stats</span>, activeState: false, endPoint: wizVaultDaily},
         {element: <span><img src={disciplinesIcon} />Crafting</span>, activeState: false, endPoint: wizVaultDaily},
         {element: <span><img src={activitiesIcon} />Activities</span>, activeState: false, endPoint: wizVaultDaily},
@@ -39,9 +42,14 @@ const Menu = () => {
         setMenuIcons(menuIcons.map(icon => {
             return {...icon, activeState: false};
         }))
+
     }, [mainKey])
 
-
+    useEffect(() => {
+        return () => {
+            setRes(null)
+        }
+    }, [res])
 
     const handleMenuLogoClick = (index: number) => {
         setMenuIcons(menuIcons.map((icon, i) =>{
@@ -53,32 +61,62 @@ const Menu = () => {
         }));
 
         if (mainKey && menuIcons[index].endPoint && !menuIcons[index].activeState) {
-            useFetch(mainKey, menuIcons[index].endPoint )
+            let ep = menuIcons[index].endPoint;
+            const fetchRes = useFetch(mainKey, ep)
+
+            fetchRes.then(res => {
+                if(res){
+                    const {data} = res;
+                    setRes(res)
+                    fetchResults(ep.url, data);
+                }
+
+            })
         }
     }
 
-
-
     return ( 
-        <div className={styles.menuIcons}>
-            {menuIcons && menuIcons.map((icon, index) => (     
-                icon.activeState === false 
-                ? 
-                <div onClick={() => handleMenuLogoClick(index)} key={index} className={styles.inactive}>{icon.element}</div>
-                :
-                <div onClick={() => handleMenuLogoClick(index)} key={index} className={styles.active}>{icon.element}</div>
-            ))}
+        <>
 
-
-            {menuIcons && menuIcons.map((icon, index) => (
-                icon.activeState === true 
-                ?
-                <div key={index} >{icon.subMenu}</div>
-                : 
-                null
-            ))}
-        </div>
+            <div className={styles.menuIcons}>
+                {menuIcons && menuIcons.map((icon, index) => (     
+                    icon.activeState === false 
+                    ? 
+                    <div onClick={() => handleMenuLogoClick(index)} key={index} className={styles.inactive}>{icon.element}</div>
+                    :
+                    <div onClick={() => handleMenuLogoClick(index)} key={index} className={styles.active}>{icon.element}</div>
+                ))}
+                {menuIcons && menuIcons.map((icon, index) => (
+                    icon.activeState === true 
+                    ?
+                    <div key={index} >{icon.subMenu}</div>
+                    : 
+                    null
+                ))}
+            </div>
+        </>
      );
 }
  
 export default Menu;
+
+
+
+import { accountInfoFunction, wizVaultDailyFunction } from "../../endpoints/accountInfo/accointInfo";
+
+function fetchResults(endpoint:string, data: any) {
+
+    switch (endpoint) {
+        case "/v2/account":
+            accountInfoFunction(data);
+            break;
+
+        case "/v2/account/wizardsvault/daily":
+            wizVaultDailyFunction(data);
+            break;
+    
+        default:
+            break;
+    }
+}
+
