@@ -25,6 +25,8 @@ useEffect(() => {
         if (mainKey) {
             (document.getElementById("select") as HTMLInputElement).value = mainKey?.key;
         }
+        console.log(mainKey);
+        
 },[savedKeys, mainKey])
 
 
@@ -39,26 +41,34 @@ if (keyToAdd.key.length > 0 && isValid === true) {
 function handleAddNewKey(): void {
     let inputValue = (document.getElementById("api-adder") as HTMLInputElement).value;
     //10 api key limit
-    if (savedKeys !== undefined && savedKeys.length < 10 && inputValue.length > 0){
+    if (savedKeys !== undefined && savedKeys.length < 10 && inputValue.length > 0 && (inputValue !== undefined || null)){
         //first key will be the main key
+        savedKeys.length === 0 ? setKeyToAdd({key: inputValue, mainKey:true}): setKeyToAdd(({key: inputValue, mainKey:false}));
+        //first key being added forces a rerender to be activated
+        if (setMainKey && savedKeys.length === 0) {
+            setMainKey({key: inputValue, mainKey:true})
+        }
 
-        savedKeys.length === 0 ? setKeyToAdd({key: inputValue, mainKey:true}) : setKeyToAdd(({key: inputValue, mainKey:false}));
-        
-        //the bug is that validKey variable is always one step behind.
         (document.getElementById("api-adder") as HTMLInputElement).value = "";
     } else if (savedKeys !== undefined && savedKeys.length === 10){
         alert("You can have a maximum of 10 API Keys. Delete some.");
     }
 }
 function handleDeleteApiKey(index: number): void {
-    if(savedKeys !== undefined && confirm("Are you sure you want to delete this key?")){
+    if(setMainKey && savedKeys !== undefined && confirm("Are you sure you want to delete this key?")){
         let newArray = savedKeys.filter((_, i) => i !== index);
+        
+        if (newArray.length === 0) {
+            setMainKey(null)
+        }
+
         keyContext?.setKeyArray(newArray);
             if(newArray.length > 0 && savedKeys[index].mainKey){
                 newArray.map((k) => {
                     k.mainKey = false;
                 })
                 newArray[0].mainKey = true
+                setMainKey(newArray[0])
             }
     }
 }

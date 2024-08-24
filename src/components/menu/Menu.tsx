@@ -14,14 +14,18 @@ import { wizVaultDaily, accountInfo, worldBosses} from "../../endpoints/accountI
 import { currencyInfo } from "../../endpoints/currencyInfo/currencies";
 import { MenuIcon } from "./menuicontype";
 import SubAccountInfo from "../../components/menu/submenus/SubAccountInfo.tsx";
+import FetchContent from "../../components/fetchContent/FetchContent.tsx";
+import spinner from "../../assets/spinner.png";
+import errorImg from "../../assets/error.png"
 
 const Menu = () => {
 
     const keyContext = useContext(KeyArrayContext);
     const mainKey = keyContext?.isMainKey;
-    const [res, setRes] = useState<any>();
-    const [loading, setLoadiing] = useState(false);
+    const [res, setRes] = useState<any>(null);
+    const [loading, setLoading] = useState(false);
     const [err, setErr] = useState(false);
+    const [needApi, setNeedApi] = useState(false);
 
     const [menuIcons, setMenuIcons] = useState<MenuIcon[]>([
 
@@ -35,14 +39,17 @@ const Menu = () => {
         {element: <span><img src={activitiesIcon} />Activities</span>, activeState: false, endPoint: wizVaultDaily},
         {element: <span><img src={lotteryIcon} />Lottery</span>,  activeState: false, endPoint: wizVaultDaily},
     ])
-
     
     useEffect(() => {
         //reset the menu selection after a key is changed
         setMenuIcons(menuIcons.map(icon => {
             return {...icon, activeState: false};
         }))
+        setLoading(false);
+        setErr(false);
 
+        (mainKey === undefined || mainKey === null) ? setNeedApi(true) : setNeedApi(false);
+        
     }, [mainKey])
 
     useEffect(() => {
@@ -51,7 +58,9 @@ const Menu = () => {
         }
     }, [res])
 
+
     const handleMenuLogoClick = (index: number) => {
+
         setMenuIcons(menuIcons.map((icon, i) =>{
             if(index === i){
                 return {...icon, activeState: true};
@@ -62,8 +71,9 @@ const Menu = () => {
 
         if (mainKey && menuIcons[index].endPoint && !menuIcons[index].activeState) {
             let ep = menuIcons[index].endPoint;
-            const fetchRes = useFetch(mainKey, ep)
 
+            const fetchRes = useFetch(mainKey, ep, setLoading, setErr)
+            setLoading(true);
             fetchRes.then(res => {
                 if(res){
                     const {data} = res;
@@ -71,13 +81,15 @@ const Menu = () => {
                     fetchResults(ep.url, data);
                 }
 
+            }).catch(() =>{
+                setLoading(false)
+                setErr(true);
             })
         }
     }
 
     return ( 
         <>
-
             <div className={styles.menuIcons}>
                 {menuIcons && menuIcons.map((icon, index) => (     
                     icon.activeState === false 
@@ -87,14 +99,38 @@ const Menu = () => {
                     <div onClick={() => handleMenuLogoClick(index)} key={index} className={styles.active}>{icon.element}</div>
                 ))}
                 {menuIcons && menuIcons.map((icon, index) => (
-                    icon.activeState === true 
+                    icon.activeState === true && icon.subMenu
                     ?
                     <div key={index} >{icon.subMenu}</div>
                     : 
                     null
                 ))}
             </div>
-        </>
+
+            {loading && !err &&
+            <div className={styles.loadingDiv}>
+                <img src={spinner} alt="loading logo" /> 
+                <h2>Loading...</h2>
+            </div>}
+
+                
+            {!loading && err &&
+            <div className={styles.errorDiv}>
+                <img src={errorImg} alt="error logo" /> 
+                <h2>Ooops! Looks like there was a problem!..</h2>
+            </div>}
+
+            {needApi &&
+            <div className={styles.errorDiv}>
+                <img src={errorImg} alt="error logo" /> 
+                <h2>You need to save an API key!</h2>
+            </div>}
+
+
+            {!err  && !loading && !needApi && 
+            <FetchContent data={res}/>}
+
+            </>
      );
 }
  

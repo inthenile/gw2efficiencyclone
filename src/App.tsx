@@ -7,13 +7,20 @@ import Menu from "./components/menu/Menu.tsx";
 
 
 const savedKeys = localStorage.getItem("savedKeys");
+
+//I have had a few bugs where the savedKeys would turn undefined and crash the website. Using this to combat that
+if(savedKeys === "undefined"){
+  localStorage.clear();
+  location.reload();
+}
+
 const keys: ApiKeyType[] = savedKeys ? JSON.parse(savedKeys) : [];
 
 type StateContextType = {
   keyArray: ApiKeyType[];
   setKeyArray: React.Dispatch<React.SetStateAction<ApiKeyType[]>>;
-  isMainKey: ApiKeyType;
-  setIsMainKey: React.Dispatch<React.SetStateAction<ApiKeyType>>;
+  isMainKey: ApiKeyType | null;
+  setIsMainKey: React.Dispatch<React.SetStateAction<ApiKeyType | null>>;
 }
 
 export const KeyArrayContext = createContext<null | StateContextType>(null);
@@ -30,7 +37,7 @@ const selectedKey = keys.filter(k => {
 
 export const ContextProvider = ({children} : ContextProviderProps) => {
   const [keyArray, setKeyArray] = useState<ApiKeyType[]>(keys);
-  const [isMainKey, setIsMainKey] = useState<ApiKeyType>(selectedKey[0])
+  const [isMainKey, setIsMainKey] = useState<ApiKeyType | null>(selectedKey[0])
 
   const value = {
     keyArray,

@@ -17,7 +17,9 @@ const SubAccountInfo = () => {
 
     const keyContext = useContext(KeyArrayContext);
     const mainKey = keyContext?.isMainKey;
-    
+    const [loading, setLoading] = useState(false);
+    const [err, setErr] = useState(false);
+
     const [subMenuIcons, setSubMenuIcons] = useState<MenuIcon[]>([
 
         {element: <span><img src={accountOverview}/> Overview </span>, activeState: true, endPoint: accountInfo},
@@ -30,10 +32,7 @@ const SubAccountInfo = () => {
     ])
 
 
-
-
         const handleSubMenuLogoClick = (index: number) => {
-
             setSubMenuIcons(subMenuIcons.map((icon, i) =>{
                 if(index === i){
                     return {...icon, activeState: true};
@@ -43,7 +42,7 @@ const SubAccountInfo = () => {
             }));
             
         if (mainKey && subMenuIcons[index].endPoint && !subMenuIcons[index].activeState) {
-            useFetch(mainKey, subMenuIcons[index].endPoint )
+            useFetch(mainKey, subMenuIcons[index].endPoint, setLoading, setErr)
         }
     }
 
