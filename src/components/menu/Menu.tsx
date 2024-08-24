@@ -17,6 +17,7 @@ import SubAccountInfo from "../../components/menu/submenus/SubAccountInfo.tsx";
 import FetchedContent from "../fetchedContent/FetchedContent.tsx";
 import spinner from "../../assets/spinner.png";
 import errorImg from "../../assets/error.png"
+import { EndpointType } from "../../endpoints/endpointtype.tsx";
 
 const Menu = () => {
 
@@ -26,13 +27,16 @@ const Menu = () => {
     const setErr = keyContext?.setErr;
     const loading = keyContext?.loading;
     const setLoading = keyContext?.setLoading;
-
     const [res, setRes] = useState<any>(null);
+    const [menuEp, setMenuEp] = useState<EndpointType>();
     const [needApi, setNeedApi] = useState(false);
-    const [menuIcons, setMenuIcons] = useState<MenuIcon[]>([
+    const [subMenuClicked, setSubMenuClicked] = useState(false); //to prevent from FetchedContent being rendered twice as it is called in both Menu and Submenu components
 
+    const [menuIcons, setMenuIcons] = useState<MenuIcon[]>([
         {element: <span><img src={dailyIcon}/>Dailies</span>, activeState: false, endPoint: wizVaultDaily},
-        {element: <span><img src={accountIcon} />Account</span>, activeState: false, endPoint: accountInfo, subMenu: <SubAccountInfo />},
+        {element: <span><img src={accountIcon} />Account</span>, activeState: false, endPoint: accountInfo, 
+                                    subMenu: <SubAccountInfo setSubMenuClicked={setSubMenuClicked}/>},
+
         //these are placeholders
         {element: <span><img src={bossIcon} />Bosses</span>, activeState: false, endPoint: worldBosses},
         {element: <span><img src={goldCoinIcon} />Currencies</span>, activeState: false, endPoint: currencyInfo},
@@ -56,12 +60,6 @@ const Menu = () => {
         
     }, [mainKey])
 
-    useEffect(() => {
-        return () => {
-            setRes(null)
-        }
-    }, [res])
-
 
     const handleMenuLogoClick = (index: number) => {
 
@@ -73,25 +71,24 @@ const Menu = () => {
             }
         }));
 
-        if (mainKey && menuIcons[index].endPoint && !menuIcons[index].activeState && setLoading && setErr) {
-            let ep = menuIcons[index].endPoint;
+        if (mainKey && menuIcons[index].endPoint  && setLoading && setErr) {
 
+            let ep = menuIcons[index].endPoint;
             const fetchRes = useFetch(mainKey, ep, setLoading, setErr)
             setLoading(true);
+            setMenuEp(ep);
             fetchRes.then(res => {
                 if(res){
                     const {data} = res;
-                    setRes(res)
-                    // fetchResults(ep.url, data);
+                    setRes(data)
                 }
-
+                
             }).catch(() =>{
                 setLoading(false)
                 setErr(true);
             })
         }
     }
-
     return ( 
         <>
             <div className={styles.menuIcons}>
@@ -131,34 +128,11 @@ const Menu = () => {
                 <h2>You need to save an API key!</h2>
             </div>}
 
-
-            {res && !err  && !loading && !needApi && 
-                <FetchedContent data={res}/>
+            {!subMenuClicked && res && !err && !loading && menuEp && 
+                <FetchedContent data={res} endpoint={menuEp} />
             }
-
             </>
      );
 }
  
 export default Menu;
-
-
-
-// import { accountInfoFunction, wizVaultDailyFunction } from "../../endpoints/accountInfo/accointInfo";
-
-// function fetchResults(endpoint:string, data: any) {
-
-//     switch (endpoint) {
-//         case "/v2/account":
-//             accountInfoFunction(data);
-//             break;
-
-//         case "/v2/account/wizardsvault/daily":
-//             wizVaultDailyFunction(data);
-//             break;
-    
-//         default:
-//             break;
-//     }
-// }
-

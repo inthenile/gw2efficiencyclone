@@ -42,15 +42,11 @@ const useFetch = (currentApiKey: ApiKeyType,
         if (timer) {
             setInterval(() => {
                 abortController.abort();
-            }, 10000);
+            }, 20000);
     
         }
 
     return result;
-
-
-
-
 }
 
 export default useFetch;

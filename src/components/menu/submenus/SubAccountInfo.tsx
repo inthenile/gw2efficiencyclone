@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { MenuIcon } from "../menuicontype";
 import { KeyArrayContext } from "../../../App";
 import walletIcon from "../../../assets/subMenus/account/wallet.png"
@@ -7,16 +7,18 @@ import bankIcon from "../../../assets/subMenus/account/bank.png"
 import charactersIcon from "../../../assets/subMenus/account/characters.png"
 import sharedInventoryIcon from "../../../assets/subMenus/account/sharedinventory.png"
 import accountOverview from "../../../assets/subMenus/account/accountOverview.png";
-import spinner from "../../../assets/spinner.png"
-import errorImg from "../../../assets/error.png"
-
 import { bankInfo, walletInfo, sharedInventoryInfo, guildInfo, accountInfo } from "../../../endpoints/accountInfo/accointInfo";
 import { charactersInfo } from "../../../endpoints/charactersInfo/charactersInfo";
 import styles from "../menu.module.css";
 import useFetch from "../../../hooks/useFetch";
+import { EndpointType } from "../../../endpoints/endpointtype";
+import FetchedContent from "../../fetchedContent/FetchedContent";
 
-const SubAccountInfo = () => {
+const SubAccountInfo = ({setSubMenuClicked : setSubMenuClicked} :
+                        {setSubMenuClicked: React.Dispatch<React.SetStateAction<boolean>>}
+) => {
 
+    
     const keyContext = useContext(KeyArrayContext);
     const mainKey = keyContext?.isMainKey;
     const err = keyContext?.err;
@@ -25,6 +27,7 @@ const SubAccountInfo = () => {
     const setLoading = keyContext?.setLoading;
 
     const [res, setRes] = useState<any>(null);
+    const [menuEp, setMenuEp] = useState<EndpointType>();
 
     const [subMenuIcons, setSubMenuIcons] = useState<MenuIcon[]>([
 
@@ -39,6 +42,7 @@ const SubAccountInfo = () => {
 
 
         const handleSubMenuLogoClick = (index: number) => {
+            setSubMenuClicked(true);
             setSubMenuIcons(subMenuIcons.map((icon, i) =>{
                 if(index === i){
                     return {...icon, activeState: true};
@@ -47,16 +51,15 @@ const SubAccountInfo = () => {
                 }
             }));
             
-        if (mainKey && subMenuIcons[index].endPoint && !subMenuIcons[index].activeState && setLoading && setErr) {
+        if (mainKey && subMenuIcons[index].endPoint && setLoading && setErr) {
             let ep = subMenuIcons[index].endPoint;
-
             const fetchRes = useFetch(mainKey, ep, setLoading, setErr)
             setLoading(true);
+            setMenuEp(ep)
             fetchRes.then(res => {
                 if(res){
                     const {data} = res;
-                    setRes(res)
-                    fetchResults(ep.url, data);
+                    setRes(data)
                 }
 
             }).catch(() =>{
@@ -76,33 +79,13 @@ const SubAccountInfo = () => {
                 :
                 <div key={index} onClick={ () => handleSubMenuLogoClick(index)} className={styles.active}> {sMenu.element} </div>
             ))}
-
         </div>
-                    
+        {console.log(res)}
+        {res && !err && !loading && menuEp && 
+            <FetchedContent data={res} endpoint={menuEp} />
+        }
         </>
      );
 }
  
 export default SubAccountInfo;
-
-
-
-
-import { accountInfoFunction, wizVaultDailyFunction } from "../../../endpoints/accountInfo/accointInfo";
-
-function fetchResults(endpoint:string, data: any) {
-
-    switch (endpoint) {
-        case "/v2/account":
-            accountInfoFunction(data);
-            break;
-
-        case "/v2/account/wizardsvault/daily":
-            wizVaultDailyFunction(data);
-            break;
-    
-        default:
-            break;
-    }
-}
-
