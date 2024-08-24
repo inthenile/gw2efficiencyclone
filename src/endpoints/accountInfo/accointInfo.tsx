@@ -7,7 +7,6 @@ export const accountInfo: EndpointType = {
 
 export function accountInfoFunction(data: any){
     console.log(data);
-
 }
 
 export const wizVaultDaily: EndpointType = {

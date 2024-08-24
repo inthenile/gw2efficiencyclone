@@ -14,6 +14,7 @@ if(savedKeys === "undefined"){
   location.reload();
 }
 
+
 const keys: ApiKeyType[] = savedKeys ? JSON.parse(savedKeys) : [];
 
 type StateContextType = {
@@ -21,6 +22,11 @@ type StateContextType = {
   setKeyArray: React.Dispatch<React.SetStateAction<ApiKeyType[]>>;
   isMainKey: ApiKeyType | null;
   setIsMainKey: React.Dispatch<React.SetStateAction<ApiKeyType | null>>;
+
+  loading: boolean;
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  err: boolean;
+  setErr: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const KeyArrayContext = createContext<null | StateContextType>(null);
@@ -38,12 +44,19 @@ const selectedKey = keys.filter(k => {
 export const ContextProvider = ({children} : ContextProviderProps) => {
   const [keyArray, setKeyArray] = useState<ApiKeyType[]>(keys);
   const [isMainKey, setIsMainKey] = useState<ApiKeyType | null>(selectedKey[0])
+  const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState(false);
 
   const value = {
     keyArray,
     setKeyArray,
     isMainKey,
     setIsMainKey,
+
+    loading,
+    setLoading,
+    err,
+    setErr
   };
 
   return (

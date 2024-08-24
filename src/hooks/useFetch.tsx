@@ -22,7 +22,7 @@ const useFetch = (currentApiKey: ApiKeyType,
     setLoading(true);
     setErr(false);
     
-    let timer = true;
+    let timer = true;   
         
         const result = fetch(fetchLink, {signal: abortController.signal})
         .then((res) =>{

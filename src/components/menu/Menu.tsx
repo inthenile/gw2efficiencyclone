@@ -14,7 +14,7 @@ import { wizVaultDaily, accountInfo, worldBosses} from "../../endpoints/accountI
 import { currencyInfo } from "../../endpoints/currencyInfo/currencies";
 import { MenuIcon } from "./menuicontype";
 import SubAccountInfo from "../../components/menu/submenus/SubAccountInfo.tsx";
-import FetchContent from "../../components/fetchContent/FetchContent.tsx";
+import FetchedContent from "../fetchedContent/FetchedContent.tsx";
 import spinner from "../../assets/spinner.png";
 import errorImg from "../../assets/error.png"
 
@@ -22,11 +22,13 @@ const Menu = () => {
 
     const keyContext = useContext(KeyArrayContext);
     const mainKey = keyContext?.isMainKey;
-    const [res, setRes] = useState<any>(null);
-    const [loading, setLoading] = useState(false);
-    const [err, setErr] = useState(false);
-    const [needApi, setNeedApi] = useState(false);
+    const err = keyContext?.err;
+    const setErr = keyContext?.setErr;
+    const loading = keyContext?.loading;
+    const setLoading = keyContext?.setLoading;
 
+    const [res, setRes] = useState<any>(null);
+    const [needApi, setNeedApi] = useState(false);
     const [menuIcons, setMenuIcons] = useState<MenuIcon[]>([
 
         {element: <span><img src={dailyIcon}/>Dailies</span>, activeState: false, endPoint: wizVaultDaily},
@@ -45,8 +47,10 @@ const Menu = () => {
         setMenuIcons(menuIcons.map(icon => {
             return {...icon, activeState: false};
         }))
-        setLoading(false);
-        setErr(false);
+        if (setLoading && setErr) {
+            setLoading(false);
+            setErr(false);
+        }
 
         (mainKey === undefined || mainKey === null) ? setNeedApi(true) : setNeedApi(false);
         
@@ -69,7 +73,7 @@ const Menu = () => {
             }
         }));
 
-        if (mainKey && menuIcons[index].endPoint && !menuIcons[index].activeState) {
+        if (mainKey && menuIcons[index].endPoint && !menuIcons[index].activeState && setLoading && setErr) {
             let ep = menuIcons[index].endPoint;
 
             const fetchRes = useFetch(mainKey, ep, setLoading, setErr)
@@ -78,7 +82,7 @@ const Menu = () => {
                 if(res){
                     const {data} = res;
                     setRes(res)
-                    fetchResults(ep.url, data);
+                    // fetchResults(ep.url, data);
                 }
 
             }).catch(() =>{
@@ -98,14 +102,15 @@ const Menu = () => {
                     :
                     <div onClick={() => handleMenuLogoClick(index)} key={index} className={styles.active}>{icon.element}</div>
                 ))}
-                {menuIcons && menuIcons.map((icon, index) => (
+            </div>
+
+            {menuIcons && menuIcons.map((icon, index) => (
                     icon.activeState === true && icon.subMenu
                     ?
                     <div key={index} >{icon.subMenu}</div>
                     : 
                     null
                 ))}
-            </div>
 
             {loading && !err &&
             <div className={styles.loadingDiv}>
@@ -127,8 +132,9 @@ const Menu = () => {
             </div>}
 
 
-            {!err  && !loading && !needApi && 
-            <FetchContent data={res}/>}
+            {res && !err  && !loading && !needApi && 
+                <FetchedContent data={res}/>
+            }
 
             </>
      );
@@ -138,21 +144,21 @@ export default Menu;
 
 
 
-import { accountInfoFunction, wizVaultDailyFunction } from "../../endpoints/accountInfo/accointInfo";
+// import { accountInfoFunction, wizVaultDailyFunction } from "../../endpoints/accountInfo/accointInfo";
 
-function fetchResults(endpoint:string, data: any) {
+// function fetchResults(endpoint:string, data: any) {
 
-    switch (endpoint) {
-        case "/v2/account":
-            accountInfoFunction(data);
-            break;
+//     switch (endpoint) {
+//         case "/v2/account":
+//             accountInfoFunction(data);
+//             break;
 
-        case "/v2/account/wizardsvault/daily":
-            wizVaultDailyFunction(data);
-            break;
+//         case "/v2/account/wizardsvault/daily":
+//             wizVaultDailyFunction(data);
+//             break;
     
-        default:
-            break;
-    }
-}
+//         default:
+//             break;
+//     }
+// }
 

@@ -7,6 +7,8 @@ import bankIcon from "../../../assets/subMenus/account/bank.png"
 import charactersIcon from "../../../assets/subMenus/account/characters.png"
 import sharedInventoryIcon from "../../../assets/subMenus/account/sharedinventory.png"
 import accountOverview from "../../../assets/subMenus/account/accountOverview.png";
+import spinner from "../../../assets/spinner.png"
+import errorImg from "../../../assets/error.png"
 
 import { bankInfo, walletInfo, sharedInventoryInfo, guildInfo, accountInfo } from "../../../endpoints/accountInfo/accointInfo";
 import { charactersInfo } from "../../../endpoints/charactersInfo/charactersInfo";
@@ -17,8 +19,12 @@ const SubAccountInfo = () => {
 
     const keyContext = useContext(KeyArrayContext);
     const mainKey = keyContext?.isMainKey;
-    const [loading, setLoading] = useState(false);
-    const [err, setErr] = useState(false);
+    const err = keyContext?.err;
+    const setErr = keyContext?.setErr;
+    const loading = keyContext?.loading;
+    const setLoading = keyContext?.setLoading;
+
+    const [res, setRes] = useState<any>(null);
 
     const [subMenuIcons, setSubMenuIcons] = useState<MenuIcon[]>([
 
@@ -41,12 +47,27 @@ const SubAccountInfo = () => {
                 }
             }));
             
-        if (mainKey && subMenuIcons[index].endPoint && !subMenuIcons[index].activeState) {
-            useFetch(mainKey, subMenuIcons[index].endPoint, setLoading, setErr)
+        if (mainKey && subMenuIcons[index].endPoint && !subMenuIcons[index].activeState && setLoading && setErr) {
+            let ep = subMenuIcons[index].endPoint;
+
+            const fetchRes = useFetch(mainKey, ep, setLoading, setErr)
+            setLoading(true);
+            fetchRes.then(res => {
+                if(res){
+                    const {data} = res;
+                    setRes(res)
+                    fetchResults(ep.url, data);
+                }
+
+            }).catch(() =>{
+                setLoading(false)
+                setErr(true);
+            })        
         }
     }
 
     return ( 
+        <>
         <div className={styles.subMenuIcons}>
             {subMenuIcons && subMenuIcons.map((sMenu, index) => (
                 sMenu.activeState === false
@@ -55,9 +76,33 @@ const SubAccountInfo = () => {
                 :
                 <div key={index} onClick={ () => handleSubMenuLogoClick(index)} className={styles.active}> {sMenu.element} </div>
             ))}
+
         </div>
-        
+                    
+        </>
      );
 }
  
 export default SubAccountInfo;
+
+
+
+
+import { accountInfoFunction, wizVaultDailyFunction } from "../../../endpoints/accountInfo/accointInfo";
+
+function fetchResults(endpoint:string, data: any) {
+
+    switch (endpoint) {
+        case "/v2/account":
+            accountInfoFunction(data);
+            break;
+
+        case "/v2/account/wizardsvault/daily":
+            wizVaultDailyFunction(data);
+            break;
+    
+        default:
+            break;
+    }
+}
+
