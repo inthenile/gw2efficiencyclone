@@ -1,0 +1,7 @@
+.expansions{
+    display: flex;
+}
+.expansions img{
+    width: 35px;
+    margin: 5px;
+}

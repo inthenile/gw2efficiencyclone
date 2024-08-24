@@ -80,8 +80,7 @@ const SubAccountInfo = ({setSubMenuClicked : setSubMenuClicked} :
                 <div key={index} onClick={ () => handleSubMenuLogoClick(index)} className={styles.active}> {sMenu.element} </div>
             ))}
         </div>
-        {console.log(res)}
-        {res && !err && !loading && menuEp && 
+        {res && !err && !loading && menuEp &&   
             <FetchedContent data={res} endpoint={menuEp} />
         }
         </>
