@@ -57,38 +57,39 @@ const Menu = () => {
         }
 
         (mainKey === undefined || mainKey === null) ? setNeedApi(true) : setNeedApi(false);
-        
+        //when a mainkey is changed, send them to Daily menu
+        handleMenuLogoClick(0);
     }, [mainKey])
 
 
     const handleMenuLogoClick = (index: number) => {
-
-        setMenuIcons(menuIcons.map((icon, i) =>{
-            if(index === i){
-                return {...icon, activeState: true};
-            } else {
-                return {...icon, activeState: false};
+                setMenuIcons(menuIcons.map((icon, i) =>{
+                    if(index === i){
+                        return {...icon, activeState: true};
+                    } else {
+                        return {...icon, activeState: false};
+                    }
+                }));
+        
+                if (mainKey && menuIcons[index].endPoint && setLoading && setErr) {
+        
+                    let ep = menuIcons[index].endPoint;
+                    const fetchRes = useFetch(mainKey, ep, setLoading, setErr)
+                    setLoading(true);
+                    setMenuEp(ep);
+                    fetchRes.then(res => {
+                        if(res){
+                            const {data} = res;
+                            setRes(data)
+                        }
+                        
+                    }).catch(() =>{
+                        setLoading(false)
+                        setErr(true);
+                    })
             }
-        }));
-
-        if (mainKey && menuIcons[index].endPoint  && setLoading && setErr) {
-
-            let ep = menuIcons[index].endPoint;
-            const fetchRes = useFetch(mainKey, ep, setLoading, setErr)
-            setLoading(true);
-            setMenuEp(ep);
-            fetchRes.then(res => {
-                if(res){
-                    const {data} = res;
-                    setRes(data)
-                }
-                
-            }).catch(() =>{
-                setLoading(false)
-                setErr(true);
-            })
         }
-    }
+
     return ( 
         <>
             <div className={styles.menuIcons}>
