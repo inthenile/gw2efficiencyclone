@@ -4,47 +4,54 @@ import { ApiKeyType } from "../components/api/apitype";
 import { EndpointType } from "../endpoints/endpointtype";
 
 
-const useFetch = (currentApiKey: ApiKeyType,
+const useFetch = (
     endpoint: EndpointType,
     setLoading: React.Dispatch<React.SetStateAction<boolean>>,
     setErr: React.Dispatch<React.SetStateAction<boolean>>,
+    abortController: AbortController,
+    currentApiKey?: ApiKeyType,
     ) => {
 
-    const abortController = new AbortController();
-
+    ;
+    
     const baseUrl = "https://api.guildwars2.com";
     const fetchLink = endpoint.keyReq 
     ? 
-    `${baseUrl}${endpoint.url}?access_token=${currentApiKey.key}`
+    `${baseUrl}${endpoint.url}?access_token=${currentApiKey?.key}`
     :
     `${baseUrl}${endpoint.url}`
         
-    setLoading(true);
     setErr(false);
-    
-    let timer = true;   
-        
-        const result = fetch(fetchLink, {signal: abortController.signal})
-        .then((res) =>{
-            return res.json();
-        }).then((data) =>{
-            timer = false;
-            setLoading(false)
-            return {data}
-        }).catch((e) => {
-            console.log(e);
-            setLoading(false);
-            timer = false;
-            setErr(true);
-        })
+    setLoading(false);
+    let timer;   
 
-        //if API doesn't respond in 10 seconds, abort the call
-        if (timer) {
-            setInterval(() => {
-                abortController.abort();
-            }, 20000);
-    
+    const result = fetch(fetchLink, {signal: abortController.signal})
+    .then((res) =>{
+        if (res.ok) {
+            timer = true;
+            setLoading(true);
+            return res.json();
+        } else {
+            throw new Error("There was an error with the result")
         }
+    }).then((data) =>{
+        timer = false;
+        setLoading(false)
+        return {data}
+    }).catch((e) => {
+        console.log(e);
+        setLoading(false);
+        timer = false;
+        setErr(true);
+    })
+
+    //if API doesn't respond in 10 seconds, abort the call
+    if (timer) {
+        setInterval(() => {
+            abortController.abort();
+        }, 10000);
+
+    }
 
     return result;
 }

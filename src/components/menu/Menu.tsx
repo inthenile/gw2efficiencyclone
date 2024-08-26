@@ -31,12 +31,12 @@ const Menu = () => {
     const [menuEp, setMenuEp] = useState<EndpointType>();
     const [needApi, setNeedApi] = useState(false);
     const [subMenuClicked, setSubMenuClicked] = useState(false); //to prevent from FetchedContent being rendered twice as it is called in both Menu and Submenu components
+    const abortController = new AbortController();
 
     const [menuIcons, setMenuIcons] = useState<MenuIcon[]>([
         {element: <span><img src={dailyIcon}/>Dailies</span>, activeState: false, endPoint: wizVaultDaily},
-        {element: <span><img src={accountIcon} />Account</span>, activeState: false, endPoint: accountInfo, 
-                                    subMenu: <SubAccountInfo setSubMenuClicked={setSubMenuClicked}/>},
-
+        {element: <span id="account-info"><img src={accountIcon} />Account</span>, activeState: false, endPoint: accountInfo, 
+                                    subMenu: <SubAccountInfo setSubMenuClicked={setSubMenuClicked} subMenuClicked={subMenuClicked}/>},
         //these are placeholders
         {element: <span><img src={bossIcon} />Bosses</span>, activeState: false, endPoint: worldBosses},
         {element: <span><img src={goldCoinIcon} />Currencies</span>, activeState: false, endPoint: currencyInfo},
@@ -45,56 +45,54 @@ const Menu = () => {
         {element: <span><img src={activitiesIcon} />Activities</span>, activeState: false, endPoint: wizVaultDaily},
         {element: <span><img src={lotteryIcon} />Lottery</span>,  activeState: false, endPoint: wizVaultDaily},
     ])
-    
+
     useEffect(() => {
-        //reset the menu selection after a key is changed
-        setMenuIcons(menuIcons.map(icon => {
-            return {...icon, activeState: false};
-        }))
         if (setLoading && setErr) {
             setLoading(false);
             setErr(false);
         }
-
         (mainKey === undefined || mainKey === null) ? setNeedApi(true) : setNeedApi(false);
         //when a mainkey is changed, send them to Daily menu
-        handleMenuLogoClick(0);
+        handleMenuLogoClick(0)
     }, [mainKey])
 
 
+  
     const handleMenuLogoClick = (index: number) => {
-                setMenuIcons(menuIcons.map((icon, i) =>{
-                    if(index === i){
-                        return {...icon, activeState: true};
-                    } else {
-                        return {...icon, activeState: false};
-                    }
-                }));
-        
-                if (mainKey && menuIcons[index].endPoint && setLoading && setErr) {
-        
-                    let ep = menuIcons[index].endPoint;
-                    const fetchRes = useFetch(mainKey, ep, setLoading, setErr)
-                    setLoading(true);
-                    setMenuEp(ep);
-                    fetchRes.then(res => {
-                        if(res){
-                            const {data} = res;
-                            setRes(data)
-                        }
-                        
-                    }).catch(() =>{
-                        setLoading(false)
-                        setErr(true);
-                    })
+            
+        setMenuIcons(menuIcons.map((icon, i) =>{
+            if(index === i){
+                return {...icon, activeState: true};
+            } else {
+                return {...icon, activeState: false};
             }
-        }
+        }));
+        
+        if (mainKey && menuIcons[index].endPoint && setLoading && setErr && !menuIcons[index].activeState) {
 
+            let ep = menuIcons[index].endPoint;
+            const fetchRes = useFetch(ep, setLoading, setErr, abortController, mainKey)
+            setLoading(true);
+            setMenuEp(ep);
+            
+            fetchRes.then(res => {
+                if(res){
+                    const {data} = res;
+                    setRes(data)
+                }
+            }).catch(() =>{
+                setLoading(false)
+                setErr(true);
+            })
+        }
+    }
+
+    
     return ( 
         <>
             <div className={styles.menuIcons}>
                 {menuIcons && menuIcons.map((icon, index) => (     
-                    icon.activeState === false 
+                    !icon.activeState  
                     ? 
                     <div onClick={() => handleMenuLogoClick(index)} key={index} className={styles.inactive}>{icon.element}</div>
                     :
@@ -103,19 +101,15 @@ const Menu = () => {
             </div>
 
             {menuIcons && menuIcons.map((icon, index) => (
-                    icon.activeState === true && icon.subMenu
-                    ?
-                    <div key={index} >{icon.subMenu}</div>
-                    : 
-                    null
-                ))}
+                icon.activeState && icon.subMenu &&
+                <div key={index}>{icon.subMenu}</div>
+            ))}                
 
             {loading && !err &&
             <div className={styles.loadingDiv}>
                 <img src={spinner} alt="loading logo" /> 
                 <h2>Loading...</h2>
             </div>}
-
                 
             {!loading && err &&
             <div className={styles.errorDiv}>

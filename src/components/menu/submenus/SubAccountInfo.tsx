@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { MenuIcon } from "../menuicontype";
 import { KeyArrayContext } from "../../../App";
 import walletIcon from "../../../assets/subMenus/account/wallet.png"
@@ -14,10 +14,16 @@ import useFetch from "../../../hooks/useFetch";
 import { EndpointType } from "../../../endpoints/endpointtype";
 import FetchedContent from "../../fetchedContent/FetchedContent";
 
-const SubAccountInfo = ({setSubMenuClicked : setSubMenuClicked} :
-                        {setSubMenuClicked: React.Dispatch<React.SetStateAction<boolean>>}
+const SubAccountInfo = ({setSubMenuClicked : setSubMenuClicked,
+                        subMenuClicked: subMenuClicked
+                        } :
+                        {setSubMenuClicked: React.Dispatch<React.SetStateAction<boolean>>
+                            subMenuClicked: boolean   
+                        }
 ) => {
 
+    console.log();
+    
     
     const keyContext = useContext(KeyArrayContext);
     const mainKey = keyContext?.isMainKey;
@@ -25,9 +31,9 @@ const SubAccountInfo = ({setSubMenuClicked : setSubMenuClicked} :
     const setErr = keyContext?.setErr;
     const loading = keyContext?.loading;
     const setLoading = keyContext?.setLoading;
-
     const [res, setRes] = useState<any>(null);
     const [menuEp, setMenuEp] = useState<EndpointType>();
+    const abortController = new AbortController();
 
     const [subMenuIcons, setSubMenuIcons] = useState<MenuIcon[]>([
 
@@ -40,36 +46,50 @@ const SubAccountInfo = ({setSubMenuClicked : setSubMenuClicked} :
         {element: <span><img src={sharedInventoryIcon} /> Shared Inventory </span>, activeState: false, endPoint: sharedInventoryInfo},
     ])
 
+    //if the main Account icon is clicked while having another submenu (other than overview) is selected - this will reset the selection to overview.
+    useEffect(() => {
+        document.getElementById("account-info")?.addEventListener("click", () => handleSubMenuLogoClick(0))
+        setSubMenuClicked(false);
+        return() => {
+            document.getElementById("account-info")?.removeEventListener("click", () => handleSubMenuLogoClick(0))
+            setSubMenuClicked(false)
+            console.log("unmounting");
+         }
+    }, [])
 
-        const handleSubMenuLogoClick = (index: number) => {
-            setSubMenuClicked(true);
-            setSubMenuIcons(subMenuIcons.map((icon, i) =>{
-                if(index === i){
-                    return {...icon, activeState: true};
-                } else {
-                    return {...icon, activeState: false};
-                }
-            }));
-            
-        if (mainKey && subMenuIcons[index].endPoint && setLoading && setErr) {
-            let ep = subMenuIcons[index].endPoint;
-            const fetchRes = useFetch(mainKey, ep, setLoading, setErr)
-            setLoading(true);
-            setMenuEp(ep)
-            fetchRes.then(res => {
-                if(res){
-                    const {data} = res;
-                    setRes(data)
-                }
 
-            }).catch(() =>{
-                setLoading(false)
-                setErr(true);
-            })        
+    const handleSubMenuLogoClick = (index: number) => {
+       
+        if(!subMenuClicked){
+            setSubMenuClicked(true)
         }
+        
+        setSubMenuIcons(subMenuIcons.map((icon, i) =>{
+            if(index === i){
+                return {...icon, activeState: true};
+            } else {
+                return {...icon, activeState: false};
+            }
+        }));
+        
+    if (mainKey && subMenuIcons[index].endPoint && setLoading && setErr) {
+        let ep = subMenuIcons[index].endPoint;
+        const fetchRes = useFetch(ep, setLoading, setErr, abortController, mainKey)
+        setLoading(true);
+        setMenuEp(ep)
+        fetchRes.then(res => {
+            if(res){
+                const {data} = res;
+                setRes(data)
+            }
+        }).catch(() =>{
+            setLoading(false)
+            setErr(true);
+        })        
     }
+}
 
-    return ( 
+return ( 
         <>
         <div className={styles.subMenuIcons}>
             {subMenuIcons && subMenuIcons.map((sMenu, index) => (

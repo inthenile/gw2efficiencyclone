@@ -4,78 +4,115 @@ import poficon from "../../../assets/expansions/pof.png"
 import eodicon from "../../../assets/expansions/eod.png"
 import sotoicon from "../../../assets/expansions/soto.png"
 import jwicon from "../../../assets/expansions/jw.png"
-import { useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import styles from "./accountInfo.module.css"
+import { DataContext } from "../FetchedContent"
+import spinner from "../../../assets/spinner.png";
+import errorImg from "../../../assets/error.png"
 
-const AccountInfo = ({data: data} : {data: any}) => {
 
-    const {access, created, guilds, name} = data;
+const AccountInfo = () => {
+
     
-    const [iconArray, setIconArray] = useState<JSX.Element[]>([]);
-    const [guildArray, setGuildArray] = useState<any[]>([]);
-    const [fetching, setFetching] = useState<boolean>(true);
-
-    useEffect(() =>{
+    const dataInfo = useContext(DataContext)
+    const data = dataInfo?.data;
     const abortController = new AbortController();
-         //push owned expansion icons into an array and then map them
-       access && access?.map((expansion:any) => {
-            switch(expansion){
-                case "GuildWars2":
-                    setIconArray(i => [...i, <img src={gw2icon}/>])
-                break;
-                case "HeartOfThorns":
-                    setIconArray(i => [...i, <img src={hoticon}/>])
-                break;
-                case "PathOfFire":
-                    setIconArray(i => [...i, <img src={poficon}/>])
-                break;
-                case "EndOfDragons":
-                    setIconArray(i => [...i, <img src={eodicon}/>])
-                break;
-                case "SecretsOfTheObscure":
-                    setIconArray(i => [...i, <img src={sotoicon}/>])
-                break;
-                case "JanthirWilds":
-                    setIconArray(i => [...i, <img src={jwicon}/>])
-                break;
-            }
-        })
+    const [err, setErr] = useState(false);
+    const [fetching, setFetching] = useState<boolean>(false);
+    const [guildNames, setGuildNames] = useState<GuildInfo[]>([]);
 
-        //make a fetch request to get information about the guilds and store them in an array
-        for(let i=0; i < guilds?.length; i++){
-            fetch(`https://api.guildwars2.com/v2/guild/${guilds[i]}`, {signal: abortController.signal})
-                .then(res =>{
-                    return res.json();
-                }).then(data =>{
-                    setGuildArray(g => [...g, data]);
-                    setFetching(false);
-                }).catch(e => {
-                    console.log("There was an error");
-                    setFetching(false);
-                    if (e.name === 'AbortError') {
-                        console.log('Request aborted');
-                    }
-                })
-        }
+    let expansions: React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>[] = [];
+    let accName: string = "";
+    let creationDate: string = "";
 
-        return() => {
-            abortController.abort();
-            setFetching(true);
-        }
-    }, [])
+    type GuildInfo = {
+        name: string,
+        tag: string
+    }
+    const {access, created, guilds, name} = data;
 
     // present the date in a simpler way
     const splitDate = created && created?.split(/\D+/);
-    const newDate = splitDate && (`${splitDate[2]}/${splitDate[1]}/${splitDate[0]}`);
+    const finalDate = splitDate && (`${splitDate[2]}/${splitDate[1]}/${splitDate[0]}`);
 
-    const expansions = iconArray && iconArray?.map((icon, index) => (
-        <div key={index}>{icon}</div>
-    ))
+    accName = name;
+    creationDate = finalDate
+    expansions = access && access.map((expansion: any) => {
+        switch(expansion){
+            case "GuildWars2":
+                return <div key={0}><img src={gw2icon}/></div>
+            case "HeartOfThorns":
+                return <div key={1}><img src={hoticon}/></div>
+            case "PathOfFire":
+                return <div key={2}><img src={poficon}/></div>
+            case "EndOfDragons":
+                return <div key={3}><img src={eodicon}/></div>
+            case "SecretsOfTheObscure":
+                return <div key={4}><img src={sotoicon}/></div>
+            case "JanthirWilds":
+                return <div key={5}><img src={jwicon}/></div>
+            default:
+                break;
+        }
+    }) 
 
 
-    return ( 
-        <>
-            {!fetching && <div className={styles.tableStyle}>
+    useEffect(() =>{
+        console.log("mounted");
+
+    const promiseArray = [];
+    const baseUrl = "https://api.guildwars2.com/v2/guild/";
+    for(let i = 0; i < guilds?.length; i++){
+        const guildId = guilds[i];
+        const guildUrl = baseUrl + guildId;
+        promiseArray.push(guildUrl);
+    }
+
+    // ake a fetch request to get information about the guilds
+    // separated the fetch call 2 separate promises, so I don't setFeching to true after the first set of promises are completed
+
+        let ignore = false;
+        const promises = Promise.all(promiseArray.map(allGuilds => 
+        fetch(allGuilds)))
+        .then(responses => {
+            return Promise.all(responses.map(res =>{
+                if (res.ok ) {
+                    setFetching(true);
+                    return res.json()
+                } else {
+                    throw new Error(">>> ?")
+                }
+            }))
+        })
+
+            promises.then(data =>{
+                if (!ignore) {
+                    data.map(_guild=>{
+                        const guildInfo = {name: _guild.name, tag: _guild.tag};
+                        setGuildNames(g => [...g, guildInfo]);
+                    })
+                }
+            }).catch((e) =>{
+                console.log(e);
+            }).finally(() =>{
+                setFetching(false);
+            })
+
+ 
+        return() =>{
+            abortController.abort();
+            setErr(false)
+            setFetching(false)
+            ignore = true;
+            console.log("unmounted");
+        }
+    }, [data])
+
+
+    const Table = () => {
+
+            return (
+                <div className={styles.tableStyle}>
                 <h1>Your account overview:</h1>
                 <table> 
                     <thead>
@@ -87,12 +124,12 @@ const AccountInfo = ({data: data} : {data: any}) => {
                     </thead>
                     <tbody>
                         <tr>
-                            <td>{name}</td>
-                            <td className={styles.expansions}>{expansions}</td>
-                            <td>{newDate}</td>
+                            <td>{accName}</td>
+                            <td className={styles.expansions}><>{expansions}</></td>
+                            <td>{creationDate}</td>
                         </tr>
                     </tbody>
-
+            
                 </table>
                 
                 <table>
@@ -104,14 +141,33 @@ const AccountInfo = ({data: data} : {data: any}) => {
                 <tbody>
                     <tr>
                         <td>
-                        {guildArray && guildArray?.map((guild, index) => (
+                        {guildNames && guildNames.map((guild, index)=> (
                             <div key={index}>{guild.name} [{guild.tag}]</div>
                         ))}
                         </td>
                     </tr>
                 </tbody>
                 </table>
+            </div>
+            )
+    }
+
+    return ( 
+        <>
+            {fetching && !err &&
+            <div className={styles.loadingDiv}>
+                <img src={spinner} alt="loading logo" /> 
+                <h2>Loading...</h2>
             </div>}
+
+            {!fetching && err &&
+            <div className={styles.errorDiv}>
+                <img src={errorImg} alt="error logo" /> 
+                <h2>Ooops! Looks like there was a problem!..</h2>
+            </div>}
+
+
+            {!fetching && !err && <Table />}
         </>
     );
 }

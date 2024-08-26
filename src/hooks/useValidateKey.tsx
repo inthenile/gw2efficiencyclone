@@ -12,7 +12,6 @@ const [fetchedData, setfetchedData] = useState<any>([]);
 const endPoint = "https://api.guildwars2.com/v2/account?access_token=";
 
 useEffect(()=>{
-
     if(apikey.key.length > 0){
         fetch(`${endPoint}${apikey.key}`)
         .then((res) => {
