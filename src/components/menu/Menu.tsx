@@ -45,7 +45,7 @@ const Menu = () => {
     const [menuEp, setMenuEp] = useState<EndpointType | undefined>({url:"/v2/account/wizardsvault/daily", keyReq: true});
     const [needApi, setNeedApi] = useState(false);
     const [subMenuOn, setSubMenuOn] = useState(false);
-    const [burgerToggle, setBurgerToggle] = useState(false);
+    const [burgerToggle, setBurgerToggle] = useState(true);
 
     useEffect(() => {
         setLoading(false);
@@ -100,6 +100,22 @@ const Menu = () => {
         setBurgerToggle(!burgerToggle)
     }
 
+    //check window size to see whether the burger toggle should be available
+    useEffect(() => {
+        function checkWindowSize() {
+            if (window.innerWidth > 700) {
+                setBurgerToggle(true);
+            } else {
+                setBurgerToggle(false);
+            }
+        }
+        window.addEventListener("resize", checkWindowSize)
+        return () =>{
+            window.removeEventListener("resize", checkWindowSize);
+        }
+    }, [])
+
+     
     return ( 
         <>
         {<img src={hamburgerMenu} alt="hamburger menu icon" className={styles.hamburgerMenu}
@@ -117,6 +133,8 @@ const Menu = () => {
         
             {res && !err && !loading && 
             <>
+            {/**THERE IS CURRENTLY A BUG WITH THE BURGER MENU
+             * THAT IF YOU TOGGLE THE MENU AND THEN CHANGE SCREEN SIZE, THE MENU IS AFFECTED. FIND A FIX SO THEY DONT INTERACT WITH EACH OTHER LIKE THAT**/}
               <SubAccountInfo subMenuOn={subMenuOn} burgerToggle={burgerToggle}/>
               {!subMenuOn && <FetchedContent url={menuEp?.url} data={res}/>}
             </>  

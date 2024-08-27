@@ -2,6 +2,9 @@
     display: flex;
     flex-direction: column;
 }
+.footer-container img{
+    margin: 0;
+}
 .footer-container{
     gap: 10px;
     text-align: center;

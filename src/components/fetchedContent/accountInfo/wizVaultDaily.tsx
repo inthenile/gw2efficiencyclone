@@ -5,7 +5,7 @@ import pvpIcon from "../../../assets/dailies/PvP.png"
 import astralIcon from "../../../assets/dailies/astral_acclaim.png"
 import taskComplete from "../../../assets/dailies/task_complete.png"
 import taskIncomplete from "../../../assets/dailies/task_incomplete.png"
-import { ReactNode, useState } from "react"
+import { useState } from "react"
 
 const WizVaultDaily = ({data: data}: any) => {
 
