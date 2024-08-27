@@ -6,6 +6,7 @@ import ApiKey from "./components/api/ApiKey.tsx";
 import Menu from "./components/menu/Menu.tsx";
 
 
+
 const savedKeys = localStorage.getItem("savedKeys");
 
 //I have had a few bugs where the savedKeys would turn undefined and crash the website. Using this to combat that
@@ -22,11 +23,6 @@ type StateContextType = {
   setKeyArray: React.Dispatch<React.SetStateAction<ApiKeyType[]>>;
   isMainKey: ApiKeyType | null;
   setIsMainKey: React.Dispatch<React.SetStateAction<ApiKeyType | null>>;
-
-  loading: boolean;
-  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
-  err: boolean;
-  setErr: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const KeyArrayContext = createContext<null | StateContextType>(null);
@@ -44,19 +40,12 @@ const selectedKey = keys.filter(k => {
 export const ContextProvider = ({children} : ContextProviderProps) => {
   const [keyArray, setKeyArray] = useState<ApiKeyType[]>(keys);
   const [isMainKey, setIsMainKey] = useState<ApiKeyType | null>(selectedKey[0])
-  const [loading, setLoading] = useState(false);
-  const [err, setErr] = useState(false);
 
   const value = {
     keyArray,
     setKeyArray,
     isMainKey,
     setIsMainKey,
-
-    loading,
-    setLoading,
-    err,
-    setErr
   };
 
   return (
@@ -66,10 +55,10 @@ export const ContextProvider = ({children} : ContextProviderProps) => {
   )
 }
 
+
 function App() {
 
 const [showApi, setShowApi] = useState(false);
-
 
   return (
     <>
@@ -78,7 +67,8 @@ const [showApi, setShowApi] = useState(false);
         <>
           <Header showApi={showApi} setShowApi={setShowApi} />
           {showApi && <ApiKey />}
-          <Menu />
+            <Menu>
+            </Menu>
         </>
       </ContextProvider>
       <Footer />

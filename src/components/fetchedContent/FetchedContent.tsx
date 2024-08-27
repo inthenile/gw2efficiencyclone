@@ -1,36 +1,20 @@
-import { createContext } from "react";
-import { EndpointType } from "../../endpoints/endpointtype";
 import AccountInfo from "./accountInfo/accountInfo";
 import SharedInventoryInfo from "./accountInfo/sharedInventoryInfo";
 import WizVaultDaily from "./accountInfo/wizVaultDaily";
 
-type StateContextType = {
+
+type Props = {
+    url: string | undefined,
     data: any
 }
 
-export const DataContext = createContext<null | StateContextType>(null);
 
-const FetchContent = ({data: _data, endpoint: endpoint} : {data: any, endpoint:EndpointType}) => {
-    
-    type ContextProviderProps = {
-        children: React.ReactNode;
-    }
-    const ContextProvider = ({children}: ContextProviderProps) => {
-        const data = _data;
-        const value ={
-            data
-        }
-        return (
-            <DataContext.Provider value={value}>
-                {children}
-            </DataContext.Provider>
-        )
-    }
-
+const FetchContent = ({url, data}: Props) => {
+ 
     let result;
-    switch (endpoint.url) {
+    switch (url) {
         case "/v2/account":
-            result = <AccountInfo/>
+            result = <AccountInfo data={data}/>
             break;
         case "/v2/account/wizardsvault/daily":
             result=  <WizVaultDaily />
@@ -46,9 +30,7 @@ const FetchContent = ({data: _data, endpoint: endpoint} : {data: any, endpoint:E
     }
 
     return(
-        <ContextProvider>
-            {result}
-        </ContextProvider>
+           result
     )
 }
  

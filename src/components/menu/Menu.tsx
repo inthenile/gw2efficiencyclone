@@ -13,121 +13,131 @@ import { KeyArrayContext } from "../../App";
 import { wizVaultDaily, accountInfo, worldBosses} from "../../endpoints/accountInfo/accointInfo";
 import { currencyInfo } from "../../endpoints/currencyInfo/currencies";
 import { MenuIcon } from "./menuicontype";
-import SubAccountInfo from "../../components/menu/submenus/SubAccountInfo.tsx";
-import FetchedContent from "../fetchedContent/FetchedContent.tsx";
 import spinner from "../../assets/spinner.png";
 import errorImg from "../../assets/error.png"
 import { EndpointType } from "../../endpoints/endpointtype.tsx";
+import SubAccountInfo from "./submenus/SubAccountInfo.tsx";
+import FetchedContent from "../fetchedContent/FetchedContent.tsx";
+
+const menuIcons: MenuIcon[]  = [
+    {element: <span><img src={dailyIcon}/>Dailies</span>, activeState: false, endPoint: wizVaultDaily},
+    {element: <span id="account-info"><img src={accountIcon} />Account</span>, activeState: false, endPoint: accountInfo, subMenu: true},
+    //these are placeholders
+    {element: <span><img src={bossIcon} />Bosses</span>, activeState: false, endPoint: worldBosses},
+    {element: <span><img src={goldCoinIcon} />Currencies</span>, activeState: false, endPoint: currencyInfo},
+    {element: <span><img src={statsIcon} />Stats</span>, activeState: false, endPoint: wizVaultDaily},
+    {element: <span><img src={disciplinesIcon} />Crafting</span>, activeState: false, endPoint: wizVaultDaily},
+    {element: <span><img src={activitiesIcon} />Activities</span>, activeState: false, endPoint: wizVaultDaily},
+    {element: <span><img src={lotteryIcon} />Lottery</span>,  activeState: false, endPoint: wizVaultDaily},
+]
+
+
+
+
+const abortController = new AbortController();
 
 const Menu = () => {
-
+    
     const keyContext = useContext(KeyArrayContext);
     const mainKey = keyContext?.isMainKey;
-    const err = keyContext?.err;
-    const setErr = keyContext?.setErr;
-    const loading = keyContext?.loading;
-    const setLoading = keyContext?.setLoading;
+    const [err, setErr] = useState(false);
+    const [loading, setLoading] = useState(false);
     const [res, setRes] = useState<any>(null);
-    const [menuEp, setMenuEp] = useState<EndpointType>();
+    const [menuEp, setMenuEp] = useState<EndpointType>({url:"/v2/account/wizardsvault/daily", keyReq: true});
     const [needApi, setNeedApi] = useState(false);
-    const [subMenuClicked, setSubMenuClicked] = useState(false); //to prevent from FetchedContent being rendered twice as it is called in both Menu and Submenu components
-    const abortController = new AbortController();
-
-    const [menuIcons, setMenuIcons] = useState<MenuIcon[]>([
-        {element: <span><img src={dailyIcon}/>Dailies</span>, activeState: false, endPoint: wizVaultDaily},
-        {element: <span id="account-info"><img src={accountIcon} />Account</span>, activeState: false, endPoint: accountInfo, 
-                                    subMenu: <SubAccountInfo setSubMenuClicked={setSubMenuClicked} subMenuClicked={subMenuClicked}/>},
-        //these are placeholders
-        {element: <span><img src={bossIcon} />Bosses</span>, activeState: false, endPoint: worldBosses},
-        {element: <span><img src={goldCoinIcon} />Currencies</span>, activeState: false, endPoint: currencyInfo},
-        {element: <span><img src={statsIcon} />Stats</span>, activeState: false, endPoint: wizVaultDaily},
-        {element: <span><img src={disciplinesIcon} />Crafting</span>, activeState: false, endPoint: wizVaultDaily},
-        {element: <span><img src={activitiesIcon} />Activities</span>, activeState: false, endPoint: wizVaultDaily},
-        {element: <span><img src={lotteryIcon} />Lottery</span>,  activeState: false, endPoint: wizVaultDaily},
-    ])
+    const [subMenuOn, setSubMenuOn] = useState(false);
+    const [cooldown, setCooldown] = useState(false);
 
     useEffect(() => {
-        if (setLoading && setErr) {
-            setLoading(false);
-            setErr(false);
-        }
+        setLoading(false);
         (mainKey === undefined || mainKey === null) ? setNeedApi(true) : setNeedApi(false);
         //when a mainkey is changed, send them to Daily menu
         handleMenuLogoClick(0)
+        return () => {
+        }
     }, [mainKey])
 
-
-  
     const handleMenuLogoClick = (index: number) => {
-            
-        setMenuIcons(menuIcons.map((icon, i) =>{
-            if(index === i){
-                return {...icon, activeState: true};
-            } else {
-                return {...icon, activeState: false};
-            }
-        }));
-        
-        if (mainKey && menuIcons[index].endPoint && setLoading && setErr && !menuIcons[index].activeState) {
 
-            let ep = menuIcons[index].endPoint;
-            const fetchRes = useFetch(ep, setLoading, setErr, abortController, mainKey)
-            setLoading(true);
-            setMenuEp(ep);
-            
-            fetchRes.then(res => {
-                if(res){
-                    const {data} = res;
-                    setRes(data)
+            menuIcons.map((icon, i) =>{
+                if(index === i){
+                    icon.activeState = true;
+                } else {
+                    icon.activeState = false;
                 }
-            }).catch(() =>{
-                setLoading(false)
-                setErr(true);
             })
-        }
+
+            if(menuIcons[index].subMenu){
+                setSubMenuOn(true)
+            } 
+            if (!menuIcons[index].subMenu) {
+                setSubMenuOn(false)
+            }
+            
+            if (mainKey) {
+                let ep = menuIcons[index].endPoint;
+                const fetchRes = useFetch(ep, setLoading, setErr, abortController, mainKey)
+
+                setLoading(true);
+                setMenuEp(ep);
+                
+                fetchRes.then(res => {
+                    if(res){
+                        const {data} = res;
+                        setRes(data)
+                    }   
+                }).then(() =>{
+                    setLoading(false);
+                })
+                .catch(() =>{
+                    setLoading(false)
+                    setErr(true);
+                })
+            }
+
+ 
     }
 
-    
     return ( 
         <>
-            <div className={styles.menuIcons}>
-                {menuIcons && menuIcons.map((icon, index) => (     
-                    !icon.activeState  
-                    ? 
-                    <div onClick={() => handleMenuLogoClick(index)} key={index} className={styles.inactive}>{icon.element}</div>
+        <div className={styles.menuIcons}>
+                {menuIcons.map((icon, i) =>(
+                    !icon.activeState
+                    ?
+                    <div onClick={() => handleMenuLogoClick(i)} key={i} className={styles.inactive}>{icon.element}</div>
                     :
-                    <div onClick={() => handleMenuLogoClick(index)} key={index} className={styles.active}>{icon.element}</div>
+                    <div onClick={() => handleMenuLogoClick(i)} key={i} className={styles.active}>{icon.element}</div>
                 ))}
-            </div>
+        </div>
+        
+            {res && !err && !loading &&
+            <>
+              <SubAccountInfo subMenuOn={subMenuOn} />
+              {!subMenuOn && <FetchedContent url={menuEp.url} data={res}/>}
+            </>  
+            }
 
-            {menuIcons && menuIcons.map((icon, index) => (
-                icon.activeState && icon.subMenu &&
-                <div key={index}>{icon.subMenu}</div>
-            ))}                
-
-            {loading && !err &&
+            {loading && !err && !subMenuOn &&
             <div className={styles.loadingDiv}>
                 <img src={spinner} alt="loading logo" /> 
                 <h2>Loading...</h2>
             </div>}
+
                 
-            {!loading && err &&
+           {!loading && err && !res &&
             <div className={styles.errorDiv}>
                 <img src={errorImg} alt="error logo" /> 
                 <h2>Ooops! Looks like there was a problem!..</h2>
             </div>}
 
-            {needApi &&
+            {needApi && !loading &&
             <div className={styles.errorDiv}>
                 <img src={errorImg} alt="error logo" /> 
                 <h2>You need to save an API key!</h2>
             </div>}
+        </>
+    );
 
-            {!subMenuClicked && res && !err && !loading && menuEp && 
-                <FetchedContent data={res} endpoint={menuEp} />
-            }
-            </>
-     );
 }
  
 export default Menu;

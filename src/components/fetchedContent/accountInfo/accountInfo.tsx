@@ -4,31 +4,28 @@ import poficon from "../../../assets/expansions/pof.png"
 import eodicon from "../../../assets/expansions/eod.png"
 import sotoicon from "../../../assets/expansions/soto.png"
 import jwicon from "../../../assets/expansions/jw.png"
-import { useContext, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import styles from "./accountInfo.module.css"
-import { DataContext } from "../FetchedContent"
 import spinner from "../../../assets/spinner.png";
 import errorImg from "../../../assets/error.png"
 
+const abortController = new AbortController();
 
-const AccountInfo = () => {
+let expansions: React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>[] = [];
+let accName: string = "";
+let creationDate: string = "";
 
-    
-    const dataInfo = useContext(DataContext)
-    const data = dataInfo?.data;
-    const abortController = new AbortController();
+type GuildInfo = {
+    name: string,
+    tag: string
+}
+
+const AccountInfo = ({data: data} : any) => {
+
     const [err, setErr] = useState(false);
     const [fetching, setFetching] = useState<boolean>(false);
     const [guildNames, setGuildNames] = useState<GuildInfo[]>([]);
 
-    let expansions: React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>[] = [];
-    let accName: string = "";
-    let creationDate: string = "";
-
-    type GuildInfo = {
-        name: string,
-        tag: string
-    }
     const {access, created, guilds, name} = data;
 
     // present the date in a simpler way
@@ -56,9 +53,9 @@ const AccountInfo = () => {
         }
     }) 
 
+    let ignore = false;
 
     useEffect(() =>{
-        console.log("mounted");
 
     const promiseArray = [];
     const baseUrl = "https://api.guildwars2.com/v2/guild/";
@@ -70,8 +67,7 @@ const AccountInfo = () => {
 
     // ake a fetch request to get information about the guilds
     // separated the fetch call 2 separate promises, so I don't setFeching to true after the first set of promises are completed
-
-        let ignore = false;
+        const guildArray: GuildInfo[] = [];
         const promises = Promise.all(promiseArray.map(allGuilds => 
         fetch(allGuilds)))
         .then(responses => {
@@ -84,29 +80,28 @@ const AccountInfo = () => {
                 }
             }))
         })
-
             promises.then(data =>{
                 if (!ignore) {
                     data.map(_guild=>{
                         const guildInfo = {name: _guild.name, tag: _guild.tag};
-                        setGuildNames(g => [...g, guildInfo]);
+                        guildArray.push(guildInfo)
                     })
                 }
+            }).then(() =>{
+                setFetching(false);
             }).catch((e) =>{
                 console.log(e);
-            }).finally(() =>{
-                setFetching(false);
             })
-
+        
+            setGuildNames(guildArray);
  
         return() =>{
             abortController.abort();
             setErr(false)
             setFetching(false)
             ignore = true;
-            console.log("unmounted");
         }
-    }, [data])
+    }, [])
 
 
     const Table = () => {

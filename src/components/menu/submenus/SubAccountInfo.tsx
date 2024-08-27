@@ -12,76 +12,71 @@ import { charactersInfo } from "../../../endpoints/charactersInfo/charactersInfo
 import styles from "../menu.module.css";
 import useFetch from "../../../hooks/useFetch";
 import { EndpointType } from "../../../endpoints/endpointtype";
+import spinner from "../../../assets/spinner.png";
+import errorImg from "../../../assets/error.png"
 import FetchedContent from "../../fetchedContent/FetchedContent";
 
-const SubAccountInfo = ({setSubMenuClicked : setSubMenuClicked,
-                        subMenuClicked: subMenuClicked
-                        } :
-                        {setSubMenuClicked: React.Dispatch<React.SetStateAction<boolean>>
-                            subMenuClicked: boolean   
-                        }
-) => {
+const subMenuIcons: MenuIcon[] = [
 
-    console.log();
-    
+    {element: <span><img src={accountOverview}/> Overview </span>, activeState: false, endPoint: accountInfo},
+    {element: <span><img src={charactersIcon}/> Characters </span>, activeState: false, endPoint: charactersInfo},
+    //guild info requires guiild id to be passed, find a solution for it!!!!
+    {element: <span><img src={guildsIcon} /> Guilds </span>, activeState: false, endPoint: guildInfo},
+    {element: <span><img src={walletIcon} /> Wallet </span>, activeState: false, endPoint: walletInfo},
+    {element: <span><img src={bankIcon} /> Bank </span>, activeState: false, endPoint: bankInfo},
+    {element: <span><img src={sharedInventoryIcon} /> Shared Inventory </span>, activeState: false, endPoint: sharedInventoryInfo},
+]
+
+const abortController = new AbortController();
+
+type Props = {
+    subMenuOn: boolean,
+}
+
+const SubAccountInfo = ({subMenuOn} : Props) => {
     
     const keyContext = useContext(KeyArrayContext);
     const mainKey = keyContext?.isMainKey;
-    const err = keyContext?.err;
-    const setErr = keyContext?.setErr;
-    const loading = keyContext?.loading;
-    const setLoading = keyContext?.setLoading;
+    const [err, setErr] = useState(false);
+    const [loading, setLoading] = useState(false);
     const [res, setRes] = useState<any>(null);
-    const [menuEp, setMenuEp] = useState<EndpointType>();
-    const abortController = new AbortController();
-
-    const [subMenuIcons, setSubMenuIcons] = useState<MenuIcon[]>([
-
-        {element: <span><img src={accountOverview}/> Overview </span>, activeState: true, endPoint: accountInfo},
-        {element: <span><img src={charactersIcon}/> Characters </span>, activeState: false, endPoint: charactersInfo},
-        //guild info requires guiild id to be passed, find a solution for it!!!!
-        {element: <span><img src={guildsIcon} /> Guilds </span>, activeState: false, endPoint: guildInfo},
-        {element: <span><img src={walletIcon} /> Wallet </span>, activeState: false, endPoint: walletInfo},
-        {element: <span><img src={bankIcon} /> Bank </span>, activeState: false, endPoint: bankInfo},
-        {element: <span><img src={sharedInventoryIcon} /> Shared Inventory </span>, activeState: false, endPoint: sharedInventoryInfo},
-    ])
+    const [menuEp, setMenuEp] = useState<EndpointType>({url:"/v2/account/wizardsvault/daily", keyReq: true});
 
     //if the main Account icon is clicked while having another submenu (other than overview) is selected - this will reset the selection to overview.
     useEffect(() => {
+        handleSubMenuLogoClick(0)
         document.getElementById("account-info")?.addEventListener("click", () => handleSubMenuLogoClick(0))
-        setSubMenuClicked(false);
         return() => {
             document.getElementById("account-info")?.removeEventListener("click", () => handleSubMenuLogoClick(0))
-            setSubMenuClicked(false)
-            console.log("unmounting");
          }
     }, [])
 
 
     const handleSubMenuLogoClick = (index: number) => {
-       
-        if(!subMenuClicked){
-            setSubMenuClicked(true)
-        }
-        
-        setSubMenuIcons(subMenuIcons.map((icon, i) =>{
+   
+        subMenuIcons.map((icon, i) =>{
             if(index === i){
-                return {...icon, activeState: true};
+                icon.activeState = true;
             } else {
-                return {...icon, activeState: false};
+                icon.activeState = false;
             }
-        }));
+        });
         
-    if (mainKey && subMenuIcons[index].endPoint && setLoading && setErr) {
+    if (mainKey) {
         let ep = subMenuIcons[index].endPoint;
+
         const fetchRes = useFetch(ep, setLoading, setErr, abortController, mainKey)
+
         setLoading(true);
         setMenuEp(ep)
+        
         fetchRes.then(res => {
             if(res){
                 const {data} = res;
                 setRes(data)
             }
+        }).then(() =>{
+            setLoading(false);
         }).catch(() =>{
             setLoading(false)
             setErr(true);
@@ -92,7 +87,7 @@ const SubAccountInfo = ({setSubMenuClicked : setSubMenuClicked,
 return ( 
         <>
         <div className={styles.subMenuIcons}>
-            {subMenuIcons && subMenuIcons.map((sMenu, index) => (
+            {subMenuOn && subMenuIcons && subMenuIcons.map((sMenu, index) => (
                 sMenu.activeState === false
                 ?
                 <div key={index} onClick={() => handleSubMenuLogoClick(index)} className={styles.inactive}> {sMenu.element} </div>
@@ -100,9 +95,23 @@ return (
                 <div key={index} onClick={ () => handleSubMenuLogoClick(index)} className={styles.active}> {sMenu.element} </div>
             ))}
         </div>
-        {res && !err && !loading && menuEp &&   
-            <FetchedContent data={res} endpoint={menuEp} />
-        }
+
+        {res && !loading && !err && subMenuOn &&
+        <FetchedContent url={menuEp.url} data={res} />}
+        
+        {loading && !err &&
+            <div className={styles.loadingDiv}>
+                <img src={spinner} alt="loading logo" /> 
+                <h2>Loading...</h2>
+            </div>}
+
+                
+           {!loading && err &&
+            <div className={styles.errorDiv}>
+                <img src={errorImg} alt="error logo" /> 
+                <h2>Ooops! Looks like there was a problem!..</h2>
+            </div>}
+
         </>
      );
 }
