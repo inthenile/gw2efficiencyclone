@@ -6,8 +6,6 @@ import sotoicon from "../../../assets/expansions/soto.png"
 import jwicon from "../../../assets/expansions/jw.png"
 import { useEffect, useState } from "react"
 import styles from "./accountInfo.module.css"
-import spinner from "../../../assets/spinner.png";
-import errorImg from "../../../assets/error.png"
 
 const abortController = new AbortController();
 
@@ -27,7 +25,7 @@ const AccountInfo = ({data: data} : any) => {
     const [guildNames, setGuildNames] = useState<GuildInfo[]>([]);
 
     const {access, created, guilds, name} = data;
-
+    
     // present the date in a simpler way
     const splitDate = created && created?.split(/\D+/);
     const finalDate = splitDate && (`${splitDate[2]}/${splitDate[1]}/${splitDate[0]}`);
@@ -94,20 +92,21 @@ const AccountInfo = ({data: data} : any) => {
             })
         
             setGuildNames(guildArray);
- 
+            
         return() =>{
             abortController.abort();
             setErr(false)
             setFetching(false)
             ignore = true;
         }
+
     }, [])
 
 
     const Table = () => {
 
             return (
-                <div className={styles.tableStyle}>
+                <div className={styles.tableStyle} >
                 <h1>Your account overview:</h1>
                 <table> 
                     <thead>
@@ -149,20 +148,7 @@ const AccountInfo = ({data: data} : any) => {
 
     return ( 
         <>
-            {fetching && !err &&
-            <div className={styles.loadingDiv}>
-                <img src={spinner} alt="loading logo" /> 
-                <h2>Loading...</h2>
-            </div>}
-
-            {!fetching && err &&
-            <div className={styles.errorDiv}>
-                <img src={errorImg} alt="error logo" /> 
-                <h2>Ooops! Looks like there was a problem!..</h2>
-            </div>}
-
-
-            {!fetching && !err && <Table />}
+            {!fetching && !err && guildNames?.length === guilds?.length && <Table />}
         </>
     );
 }

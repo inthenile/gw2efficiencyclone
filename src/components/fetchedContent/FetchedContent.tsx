@@ -17,7 +17,7 @@ const FetchContent = ({url, data}: Props) => {
             result = <AccountInfo data={data}/>
             break;
         case "/v2/account/wizardsvault/daily":
-            result=  <WizVaultDaily />
+            result=  <WizVaultDaily data={data}/>
             break;
         case "/v2/account/inventory":
             result= <SharedInventoryInfo />

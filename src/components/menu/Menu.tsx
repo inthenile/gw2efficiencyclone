@@ -10,7 +10,7 @@ import styles from "./menu.module.css"
 import { useContext,  useEffect,  useState } from "react";
 import useFetch from "../../hooks/useFetch";
 import { KeyArrayContext } from "../../App";
-import { wizVaultDaily, accountInfo, worldBosses} from "../../endpoints/accountInfo/accointInfo";
+import { wizVaultDaily, worldBosses} from "../../endpoints/accountInfo/accointInfo";
 import { currencyInfo } from "../../endpoints/currencyInfo/currencies";
 import { MenuIcon } from "./menuicontype";
 import spinner from "../../assets/spinner.png";
@@ -18,10 +18,11 @@ import errorImg from "../../assets/error.png"
 import { EndpointType } from "../../endpoints/endpointtype.tsx";
 import SubAccountInfo from "./submenus/SubAccountInfo.tsx";
 import FetchedContent from "../fetchedContent/FetchedContent.tsx";
+import hamburgerMenu from "../../assets/hamburger-menu.svg";
 
 const menuIcons: MenuIcon[]  = [
     {element: <span><img src={dailyIcon}/>Dailies</span>, activeState: false, endPoint: wizVaultDaily},
-    {element: <span id="account-info"><img src={accountIcon} />Account</span>, activeState: false, endPoint: accountInfo, subMenu: true},
+    {element: <span id="account-info"><img src={accountIcon} />Account</span>, activeState: false, subMenu: true},
     //these are placeholders
     {element: <span><img src={bossIcon} />Bosses</span>, activeState: false, endPoint: worldBosses},
     {element: <span><img src={goldCoinIcon} />Currencies</span>, activeState: false, endPoint: currencyInfo},
@@ -30,8 +31,6 @@ const menuIcons: MenuIcon[]  = [
     {element: <span><img src={activitiesIcon} />Activities</span>, activeState: false, endPoint: wizVaultDaily},
     {element: <span><img src={lotteryIcon} />Lottery</span>,  activeState: false, endPoint: wizVaultDaily},
 ]
-
-
 
 
 const abortController = new AbortController();
@@ -43,10 +42,10 @@ const Menu = () => {
     const [err, setErr] = useState(false);
     const [loading, setLoading] = useState(false);
     const [res, setRes] = useState<any>(null);
-    const [menuEp, setMenuEp] = useState<EndpointType>({url:"/v2/account/wizardsvault/daily", keyReq: true});
+    const [menuEp, setMenuEp] = useState<EndpointType | undefined>({url:"/v2/account/wizardsvault/daily", keyReq: true});
     const [needApi, setNeedApi] = useState(false);
     const [subMenuOn, setSubMenuOn] = useState(false);
-    const [cooldown, setCooldown] = useState(false);
+    const [burgerToggle, setBurgerToggle] = useState(false);
 
     useEffect(() => {
         setLoading(false);
@@ -74,11 +73,12 @@ const Menu = () => {
                 setSubMenuOn(false)
             }
             
-            if (mainKey) {
+            if (mainKey && menuIcons[index]?.endPoint) {
                 let ep = menuIcons[index].endPoint;
+                setLoading(true);
+
                 const fetchRes = useFetch(ep, setLoading, setErr, abortController, mainKey)
 
-                setLoading(true);
                 setMenuEp(ep);
                 
                 fetchRes.then(res => {
@@ -94,13 +94,18 @@ const Menu = () => {
                     setErr(true);
                 })
             }
+    }
 
- 
+    function handleHamburgerClick(): void {
+        setBurgerToggle(!burgerToggle)
     }
 
     return ( 
         <>
-        <div className={styles.menuIcons}>
+        {<img src={hamburgerMenu} alt="hamburger menu icon" className={styles.hamburgerMenu}
+        onClick={() => handleHamburgerClick()}/>}
+
+        <div className={`${burgerToggle ? styles.menuIcons : styles.menuInactive}`}>
                 {menuIcons.map((icon, i) =>(
                     !icon.activeState
                     ?
@@ -110,15 +115,15 @@ const Menu = () => {
                 ))}
         </div>
         
-            {res && !err && !loading &&
+            {res && !err && !loading && 
             <>
-              <SubAccountInfo subMenuOn={subMenuOn} />
-              {!subMenuOn && <FetchedContent url={menuEp.url} data={res}/>}
+              <SubAccountInfo subMenuOn={subMenuOn} burgerToggle={burgerToggle}/>
+              {!subMenuOn && <FetchedContent url={menuEp?.url} data={res}/>}
             </>  
             }
 
             {loading && !err && !subMenuOn &&
-            <div className={styles.loadingDiv}>
+            <div className={styles.loadingDiv}> 
                 <img src={spinner} alt="loading logo" /> 
                 <h2>Loading...</h2>
             </div>}

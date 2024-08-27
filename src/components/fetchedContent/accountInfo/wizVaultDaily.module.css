@@ -1,0 +1,40 @@
+.container{
+    display: flex;
+    overflow: scroll;
+    gap: 5px;
+}
+
+.taskCard{
+    text-align: center;
+    flex-shrink: 1;
+    flex-basis: 250px;
+}
+.taskCard p{
+    margin: 10px;
+}
+
+.taskCard :first-child{
+    margin-top: 10px;
+}
+.taskCard img {
+    width: 35px;
+}
+
+
+.taskCardComplete{
+    border: 1px solid var(--primary);
+    background-color: rgb(182, 222, 240);
+}
+
+.taskCardIncomplete{
+    border: 1px solid red;
+    background-color: rgb(241, 192, 192);
+}
+
+@media screen and (min-width: 700px) {
+.container{
+    justify-content: center;
+    flex-wrap: wrap;
+    overflow: unset;
+}
+}

@@ -1,14 +1,14 @@
-.menuIcons{
-    display: flex;
-    justify-content: center;    
+.menuIcons {
     text-align: center;
-    flex-wrap: wrap;
-    min-width: 500px;
-    gap: 20px;
 }
-.menuIcons span, .subMenuIcons span{
-display: flex;
-align-items: center;
+.menuIcons div span, .subMenuIcons div span {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.subMenuIcons{
+    margin: 50px auto;
+    text-align: center;
 }
 .menuIcons span:hover, .subMenuIcons:hover{
     cursor: pointer;    
@@ -16,31 +16,35 @@ align-items: center;
 .menuIcons img{
     width: 46px;
     height: 46px;
+    margin: 0;
 }
 .inactive{
     opacity: 60%;
 }
 .active{
     opacity: 100%;
-    text-decoration: underline;
-}
-.inactive:hover{
-    opacity: 100%;
 }
 
-.subMenuIcons{
-        display: flex;
-        justify-content: center;    
-        text-align: center;
-        flex-wrap: wrap;
-        gap: 20px;
-    min-width: 500px;
-
+.menuInactive{
+    display: none;
+}
+.hamburgerMenu{
+    width: 40px;
+    position:absolute;
+    top: 30px;
+    margin: 0;
+    left: 20px;
+}
+.hamburgerMenu:hover{
+    cursor: pointer;
+    opacity: 75%;
 }
 
 .subMenuIcons img{
     width: 25px;
     height: 25px;
+    margin: 0;
+
 }
 
 .loadingDiv{
@@ -54,6 +58,7 @@ align-items: center;
     width: 80px;
     height: 80px;
     animation: rotation 1s infinite linear;
+    margin: 0;
 }
 @keyframes rotation {
     from{
@@ -77,4 +82,41 @@ align-items: center;
     margin: 0 auto;
     width: 80px;
     height: 80px;
+}
+
+@media screen and (min-width: 700px) {
+    .hamburgerMenu{
+        display: none;
+    }
+    .menuIcons{
+        display: flex;
+        justify-content: center;    
+        text-align: center;
+        flex-wrap: wrap;
+        min-width: 500px;
+        gap: 20px;
+    }
+    .menuIcons span, .subMenuIcons span{
+    display: flex;
+    align-items: center;
+    }
+    .subMenuIcons{
+        display: flex;
+        justify-content: center;    
+        flex-wrap: wrap;
+        gap: 20px;
+        width: fit-content;
+        margin: 40px auto 0 auto;
+}
+    .inactive{
+        opacity: 60%;
+        width: fit-content;
+    }
+    .active{
+        opacity: 100%;
+        text-decoration: underline;
+    }
+    .inactive:hover{
+        opacity: 100%;
+    }
 }

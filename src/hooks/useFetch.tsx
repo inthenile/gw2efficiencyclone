@@ -5,7 +5,7 @@ import { EndpointType } from "../endpoints/endpointtype";
 
 
 const useFetch = (
-    endpoint: EndpointType,
+    endpoint: EndpointType | undefined,
     setLoading: React.Dispatch<React.SetStateAction<boolean>>,
     setErr: React.Dispatch<React.SetStateAction<boolean>>,
     abortController: AbortController,
@@ -15,14 +15,13 @@ const useFetch = (
     ;
     
     const baseUrl = "https://api.guildwars2.com";
-    const fetchLink = endpoint.keyReq 
+    const fetchLink = endpoint?.keyReq 
     ? 
-    `${baseUrl}${endpoint.url}?access_token=${currentApiKey?.key}`
+    `${baseUrl}${endpoint?.url}?access_token=${currentApiKey?.key}`
     :
-    `${baseUrl}${endpoint.url}`
+    `${baseUrl}${endpoint?.url}`
         
-    setErr(false);
-    setLoading(false);
+    
     let timer;   
 
     const result = fetch(fetchLink, {signal: abortController.signal})
@@ -36,7 +35,6 @@ const useFetch = (
         }
     }).then((data) =>{
         timer = false;
-        setLoading(false)
         return {data}
     }).catch((e) => {
         console.log(e);

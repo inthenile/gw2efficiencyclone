@@ -31,16 +31,18 @@ const abortController = new AbortController();
 
 type Props = {
     subMenuOn: boolean,
+    burgerToggle: boolean
 }
 
-const SubAccountInfo = ({subMenuOn} : Props) => {
+const SubAccountInfo = ({subMenuOn, burgerToggle} : Props) => {
+    console.log(burgerToggle);
     
     const keyContext = useContext(KeyArrayContext);
     const mainKey = keyContext?.isMainKey;
     const [err, setErr] = useState(false);
     const [loading, setLoading] = useState(false);
     const [res, setRes] = useState<any>(null);
-    const [menuEp, setMenuEp] = useState<EndpointType>({url:"/v2/account/wizardsvault/daily", keyReq: true});
+    const [menuEp, setMenuEp] = useState<EndpointType | undefined>({url:"/v2/account/wizardsvault/daily", keyReq: true});
 
     //if the main Account icon is clicked while having another submenu (other than overview) is selected - this will reset the selection to overview.
     useEffect(() => {
@@ -64,10 +66,10 @@ const SubAccountInfo = ({subMenuOn} : Props) => {
         
     if (mainKey) {
         let ep = subMenuIcons[index].endPoint;
+        setLoading(true);
 
         const fetchRes = useFetch(ep, setLoading, setErr, abortController, mainKey)
 
-        setLoading(true);
         setMenuEp(ep)
         
         fetchRes.then(res => {
@@ -86,7 +88,7 @@ const SubAccountInfo = ({subMenuOn} : Props) => {
 
 return ( 
         <>
-        <div className={styles.subMenuIcons}>
+        <div className={`${burgerToggle ? styles.subMenuIcons : styles.menuInactive}`}>
             {subMenuOn && subMenuIcons && subMenuIcons.map((sMenu, index) => (
                 sMenu.activeState === false
                 ?
@@ -97,9 +99,9 @@ return (
         </div>
 
         {res && !loading && !err && subMenuOn &&
-        <FetchedContent url={menuEp.url} data={res} />}
+        <FetchedContent url={menuEp?.url} data={res} />}
         
-        {loading && !err &&
+        {loading && !err && subMenuOn &&
             <div className={styles.loadingDiv}>
                 <img src={spinner} alt="loading logo" /> 
                 <h2>Loading...</h2>
@@ -117,3 +119,4 @@ return (
 }
  
 export default SubAccountInfo;
+
