@@ -1,4 +1,5 @@
 import AccountInfo from "./accountInfo/accountInfo";
+import Characters from "./accountInfo/characters";
 import SharedInventoryInfo from "./accountInfo/sharedInventoryInfo";
 import WizVaultDaily from "./accountInfo/wizVaultDaily";
 
@@ -8,9 +9,8 @@ type Props = {
     data: any
 }
 
-
 const FetchContent = ({url, data}: Props) => {
- 
+    
     let result;
     switch (url) {
         case "/v2/account":
@@ -20,18 +20,15 @@ const FetchContent = ({url, data}: Props) => {
             result=  <WizVaultDaily data={data}/>
             break;
         case "/v2/account/inventory":
-            result= <SharedInventoryInfo />
+            result= <SharedInventoryInfo data={data}/>
             break;
-        case "v2/characters":
-            result = <SharedInventoryInfo/>
+        case "/v2/characters":
+            result = <Characters data={data}/>
             break;
         default:
             result = <div>"Nothing to see here"</div>
     }
-
-    return(
-           result
-    )
+    return result;
 }
  
 export default FetchContent;

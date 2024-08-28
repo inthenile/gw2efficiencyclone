@@ -18,7 +18,7 @@ import FetchedContent from "../../fetchedContent/FetchedContent";
 
 const subMenuIcons: MenuIcon[] = [
 
-    {element: <span><img src={accountOverview}/> Overview </span>, activeState: false, endPoint: accountInfo},
+    {element: <span><img src={accountOverview}/> Overview </span>, activeState: true, endPoint: accountInfo},
     {element: <span><img src={charactersIcon}/> Characters </span>, activeState: false, endPoint: charactersInfo},
     //guild info requires guiild id to be passed, find a solution for it!!!!
     {element: <span><img src={guildsIcon} /> Guilds </span>, activeState: false, endPoint: guildInfo},
@@ -27,7 +27,6 @@ const subMenuIcons: MenuIcon[] = [
     {element: <span><img src={sharedInventoryIcon} /> Shared Inventory </span>, activeState: false, endPoint: sharedInventoryInfo},
 ]
 
-const abortController = new AbortController();
 
 type Props = {
     subMenuOn: boolean,
@@ -35,27 +34,24 @@ type Props = {
 }
 
 const SubAccountInfo = ({subMenuOn, burgerToggle} : Props) => {
-    console.log(burgerToggle);
-    
+        
     const keyContext = useContext(KeyArrayContext);
     const mainKey = keyContext?.isMainKey;
-    const [err, setErr] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [res, setRes] = useState<any>(null);
-    const [menuEp, setMenuEp] = useState<EndpointType | undefined>({url:"/v2/account/wizardsvault/daily", keyReq: true});
 
+    const [menuEp, setMenuEp] = useState<EndpointType>({url:"/v2/account", keyReq: true});
+
+    const {res, loading, err} = useFetch(menuEp, mainKey)
+    console.log(res, loading,err);
     //if the main Account icon is clicked while having another submenu (other than overview) is selected - this will reset the selection to overview.
     useEffect(() => {
-        handleSubMenuLogoClick(0)
         document.getElementById("account-info")?.addEventListener("click", () => handleSubMenuLogoClick(0))
+
         return() => {
             document.getElementById("account-info")?.removeEventListener("click", () => handleSubMenuLogoClick(0))
          }
     }, [])
 
-
     const handleSubMenuLogoClick = (index: number) => {
-   
         subMenuIcons.map((icon, i) =>{
             if(index === i){
                 icon.activeState = true;
@@ -63,27 +59,9 @@ const SubAccountInfo = ({subMenuOn, burgerToggle} : Props) => {
                 icon.activeState = false;
             }
         });
-        
-    if (mainKey) {
-        let ep = subMenuIcons[index].endPoint;
-        setLoading(true);
-
-        const fetchRes = useFetch(ep, setLoading, setErr, abortController, mainKey)
-
-        setMenuEp(ep)
-        
-        fetchRes.then(res => {
-            if(res){
-                const {data} = res;
-                setRes(data)
-            }
-        }).then(() =>{
-            setLoading(false);
-        }).catch(() =>{
-            setLoading(false)
-            setErr(true);
-        })        
-    }
+        if (mainKey && subMenuIcons[index].endPoint) {
+            setMenuEp(subMenuIcons[index].endPoint)
+        }
 }
 
 return ( 
@@ -106,7 +84,6 @@ return (
                 <img src={spinner} alt="loading logo" /> 
                 <h2>Loading...</h2>
             </div>}
-
                 
            {!loading && err &&
             <div className={styles.errorDiv}>

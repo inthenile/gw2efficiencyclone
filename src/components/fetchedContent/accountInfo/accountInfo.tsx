@@ -6,6 +6,7 @@ import sotoicon from "../../../assets/expansions/soto.png"
 import jwicon from "../../../assets/expansions/jw.png"
 import { useEffect, useState } from "react"
 import styles from "./accountInfo.module.css"
+import spinner from "../../../assets/spinner.png";
 
 const abortController = new AbortController();
 
@@ -19,11 +20,10 @@ type GuildInfo = {
 }
 
 const AccountInfo = ({data: data} : any) => {
-
-    const [err, setErr] = useState(false);
-    const [fetching, setFetching] = useState<boolean>(false);
+    
+    const [fetching, setFetching] = useState<boolean>(true);
     const [guildNames, setGuildNames] = useState<GuildInfo[]>([]);
-
+    const [err, setErr] = useState(false);
     const {access, created, guilds, name} = data;
     
     // present the date in a simpler way
@@ -51,9 +51,8 @@ const AccountInfo = ({data: data} : any) => {
         }
     }) 
 
-    let ignore = false;
-
     useEffect(() =>{
+    let ignore = false;
 
     const promiseArray = [];
     const baseUrl = "https://api.guildwars2.com/v2/guild/";
@@ -71,7 +70,6 @@ const AccountInfo = ({data: data} : any) => {
         .then(responses => {
             return Promise.all(responses.map(res =>{
                 if (res.ok ) {
-                    setFetching(true);
                     return res.json()
                 } else {
                     throw new Error(">>> ?")
@@ -86,22 +84,18 @@ const AccountInfo = ({data: data} : any) => {
                     })
                 }
             }).then(() =>{
+                setGuildNames(guildArray);
                 setFetching(false);
             }).catch((e) =>{
                 console.log(e);
+                setErr(true);
             })
         
-            setGuildNames(guildArray);
             
         return() =>{
-            abortController.abort();
-            setErr(false)
-            setFetching(false)
             ignore = true;
         }
-
-    }, [])
-
+    }, [data, setFetching, setErr])
 
     const Table = () => {
 
@@ -148,7 +142,12 @@ const AccountInfo = ({data: data} : any) => {
 
     return ( 
         <>
-            {!fetching && !err && guildNames?.length === guilds?.length && <Table />}
+            {!err && fetching &&
+            <div className={styles.loadingDiv}> 
+                <img src={spinner} alt="loading logo" /> 
+                <h2>Loading...</h2>
+            </div>}
+            {!err && !fetching && guildNames?.length === guilds?.length && <Table />}
         </>
     );
 }

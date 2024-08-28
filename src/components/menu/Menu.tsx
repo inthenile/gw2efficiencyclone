@@ -7,7 +7,7 @@ import lotteryIcon from "../../assets/menu/lottery-icon.png";
 import statsIcon from "../../assets/menu/stats-icon.png";
 import goldCoinIcon from "../../assets/menu/gold-coin-icon.png";
 import styles from "./menu.module.css"
-import { useContext,  useEffect,  useState } from "react";
+import { useContext,  useEffect,  useRef,  useState } from "react";
 import useFetch from "../../hooks/useFetch";
 import { KeyArrayContext } from "../../App";
 import { wizVaultDaily, worldBosses} from "../../endpoints/accountInfo/accointInfo";
@@ -21,7 +21,7 @@ import FetchedContent from "../fetchedContent/FetchedContent.tsx";
 import hamburgerMenu from "../../assets/hamburger-menu.svg";
 
 const menuIcons: MenuIcon[]  = [
-    {element: <span><img src={dailyIcon}/>Dailies</span>, activeState: false, endPoint: wizVaultDaily},
+    {element: <span><img src={dailyIcon}/>Dailies</span>, activeState: true, endPoint: wizVaultDaily},
     {element: <span id="account-info"><img src={accountIcon} />Account</span>, activeState: false, subMenu: true},
     //these are placeholders
     {element: <span><img src={bossIcon} />Bosses</span>, activeState: false, endPoint: worldBosses},
@@ -32,32 +32,32 @@ const menuIcons: MenuIcon[]  = [
     {element: <span><img src={lotteryIcon} />Lottery</span>,  activeState: false, endPoint: wizVaultDaily},
 ]
 
+type Props = {
+    showApi: boolean,
+    setShowApi: React.Dispatch<React.SetStateAction<boolean>>
+}
 
-const abortController = new AbortController();
-
-const Menu = () => {
+const Menu = ({showApi, setShowApi} : Props) => {
     
     const keyContext = useContext(KeyArrayContext);
     const mainKey = keyContext?.isMainKey;
-    const [err, setErr] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [res, setRes] = useState<any>(null);
-    const [menuEp, setMenuEp] = useState<EndpointType | undefined>({url:"/v2/account/wizardsvault/daily", keyReq: true});
+
+    const menuEp = useRef<EndpointType>({url:"/v2/account/wizardsvault/daily", keyReq: true})
+    
     const [needApi, setNeedApi] = useState(false);
     const [subMenuOn, setSubMenuOn] = useState(false);
     const [burgerToggle, setBurgerToggle] = useState(true);
 
+    const {res, loading, err} = useFetch(menuEp.current, mainKey);
+    console.log(res, loading,err);
+
     useEffect(() => {
-        setLoading(false);
         (mainKey === undefined || mainKey === null) ? setNeedApi(true) : setNeedApi(false);
         //when a mainkey is changed, send them to Daily menu
-        handleMenuLogoClick(0)
-        return () => {
-        }
     }, [mainKey])
 
     const handleMenuLogoClick = (index: number) => {
-
+           console.log(menuIcons[index].endPoint)
             menuIcons.map((icon, i) =>{
                 if(index === i){
                     icon.activeState = true;
@@ -66,33 +66,15 @@ const Menu = () => {
                 }
             })
 
-            if(menuIcons[index].subMenu){
+            if(menuIcons[index].subMenu && !subMenuOn){
                 setSubMenuOn(true)
             } 
-            if (!menuIcons[index].subMenu) {
+            if (!menuIcons[index].subMenu && subMenuOn) {
                 setSubMenuOn(false)
             }
             
-            if (mainKey && menuIcons[index]?.endPoint) {
-                let ep = menuIcons[index].endPoint;
-                setLoading(true);
-
-                const fetchRes = useFetch(ep, setLoading, setErr, abortController, mainKey)
-
-                setMenuEp(ep);
-                
-                fetchRes.then(res => {
-                    if(res){
-                        const {data} = res;
-                        setRes(data)
-                    }   
-                }).then(() =>{
-                    setLoading(false);
-                })
-                .catch(() =>{
-                    setLoading(false)
-                    setErr(true);
-                })
+            if (mainKey && menuIcons[index].endPoint) {
+                menuEp.current = (menuIcons[index].endPoint);
             }
     }
 
@@ -102,6 +84,7 @@ const Menu = () => {
 
     //check window size to see whether the burger toggle should be available
     useEffect(() => {
+
         function checkWindowSize() {
             if (window.innerWidth > 700) {
                 setBurgerToggle(true);
@@ -116,6 +99,10 @@ const Menu = () => {
     }, [])
 
      
+    function handleNeedApi(): void {
+        showApi ? setShowApi(false) : setShowApi(true);
+    }
+
     return ( 
         <>
         {<img src={hamburgerMenu} alt="hamburger menu icon" className={styles.hamburgerMenu}
@@ -131,12 +118,10 @@ const Menu = () => {
                 ))}
         </div>
         
-            {res && !err && !loading && 
+            {
             <>
-            {/**THERE IS CURRENTLY A BUG WITH THE BURGER MENU
-             * THAT IF YOU TOGGLE THE MENU AND THEN CHANGE SCREEN SIZE, THE MENU IS AFFECTED. FIND A FIX SO THEY DONT INTERACT WITH EACH OTHER LIKE THAT**/}
-              <SubAccountInfo subMenuOn={subMenuOn} burgerToggle={burgerToggle}/>
-              {!subMenuOn && <FetchedContent url={menuEp?.url} data={res}/>}
+              {res && !err && !loading && subMenuOn && <SubAccountInfo subMenuOn={subMenuOn} burgerToggle={burgerToggle}/>}
+              {res && !err && !loading && !subMenuOn && <FetchedContent url={menuEp.current?.url} data={res}/>}
             </>  
             }
 
@@ -147,14 +132,14 @@ const Menu = () => {
             </div>}
 
                 
-           {!loading && err && !res &&
+           {!loading && err && !res && !needApi &&
             <div className={styles.errorDiv}>
                 <img src={errorImg} alt="error logo" /> 
                 <h2>Ooops! Looks like there was a problem!..</h2>
             </div>}
 
             {needApi && !loading &&
-            <div className={styles.errorDiv}>
+            <div className={styles.needApiDiv} onClick={() => handleNeedApi()}>
                 <img src={errorImg} alt="error logo" /> 
                 <h2>You need to save an API key!</h2>
             </div>}

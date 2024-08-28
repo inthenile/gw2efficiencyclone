@@ -25,8 +25,6 @@ useEffect(() => {
         if (mainKey) {
             (document.getElementById("select") as HTMLInputElement).value = mainKey?.key;
         }
-        console.log(mainKey);
-        
 },[savedKeys, mainKey])
 
 
@@ -115,6 +113,7 @@ function handleMakeMainKey(index: number): void{
             <div className={styles["api-container"]}>
                 <h2>Your API Keys</h2>
                 {err && <h4>"This API key is invalid. Please check it and re-enter."</h4>}
+                {savedKeys?.length === 0 && <h4 style={{color: "red"}}>YOU HAVE NO SAVED KEYS</h4>}
                 <ol>
                 {savedKeys && savedKeys.map((apiKey, index) => <li className={styles["li-element"]} key={index}>
                     {/*Move BUTTON up*/}

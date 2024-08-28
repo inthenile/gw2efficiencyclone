@@ -1,0 +1,9 @@
+.charList{
+    list-style: none;
+}
+
+.charListItem{
+    background-color: beige;
+    margin: 10px;
+    
+}

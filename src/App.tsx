@@ -15,7 +15,6 @@ if(savedKeys === "undefined"){
   location.reload();
 }
 
-
 const keys: ApiKeyType[] = savedKeys ? JSON.parse(savedKeys) : [];
 
 type StateContextType = {
@@ -60,19 +59,16 @@ function App() {
 
 const [showApi, setShowApi] = useState(false);
 
-  return (
+    return (
     <>
-      
       <ContextProvider>
         <>
           <Header showApi={showApi} setShowApi={setShowApi} />
           {showApi && <ApiKey />}
-            <Menu>
-            </Menu>
+          <Menu showApi={showApi} setShowApi={setShowApi} />
         </>
       </ContextProvider>
       <Footer />
-
     </>
   )
 }

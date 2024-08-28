@@ -1,45 +1,50 @@
 //this custom hook will fetch data from gw2 api endpoints
-import React from "react";
+import { useEffect, useState } from "react";
 import { ApiKeyType } from "../components/api/apitype";
 import { EndpointType } from "../endpoints/endpointtype";
 
 
+
 const useFetch = (
-    endpoint: EndpointType | undefined,
-    setLoading: React.Dispatch<React.SetStateAction<boolean>>,
-    setErr: React.Dispatch<React.SetStateAction<boolean>>,
-    abortController: AbortController,
-    currentApiKey?: ApiKeyType,
+    endpoint: EndpointType,
+    currentApiKey: ApiKeyType | null | undefined,
     ) => {
 
-    ;
-    
+    const [err, setErr] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [res, setRes] = useState<any>(null);
     const baseUrl = "https://api.guildwars2.com";
     const fetchLink = endpoint?.keyReq 
     ? 
     `${baseUrl}${endpoint?.url}?access_token=${currentApiKey?.key}`
     :
     `${baseUrl}${endpoint?.url}`
-        
     
+    
+useEffect(() =>{
+    const abortController = new AbortController();
+    setLoading(true);
     let timer;   
-
-    const result = fetch(fetchLink, {signal: abortController.signal})
+    timer = true;
+    
+    fetch(fetchLink, {signal: abortController.signal})
     .then((res) =>{
         if (res.ok) {
-            timer = true;
-            setLoading(true);
             return res.json();
         } else {
             throw new Error("There was an error with the result")
         }
     }).then((data) =>{
         timer = false;
-        return {data}
+        setRes(data);
+        setLoading(false);
+        setErr(false);
     }).catch((e) => {
         console.log(e);
         setLoading(false);
         timer = false;
+        setRes(null)
+
         setErr(true);
     })
 
@@ -48,10 +53,13 @@ const useFetch = (
         setInterval(() => {
             abortController.abort();
         }, 10000);
-
     }
+    return() => {
+    }
+}, [currentApiKey, endpoint, setRes, setLoading, setErr])
 
-    return result;
-}
+        return {res, loading, err}
+    }
+    
 
 export default useFetch;
