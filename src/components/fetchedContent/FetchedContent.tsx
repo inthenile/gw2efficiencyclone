@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import AccountInfo from "./accountInfo/accountInfo";
 import Characters from "./accountInfo/characters";
 import SharedInventoryInfo from "./accountInfo/sharedInventoryInfo";
@@ -6,28 +7,40 @@ import WizVaultDaily from "./accountInfo/wizVaultDaily";
 
 type Props = {
     url: string | undefined,
-    data: any
+    _data: any
 }
 
-const FetchContent = ({url, data}: Props) => {
-    
-    let result;
+const FetchContent = ({url, _data}: Props) => {
+    const data = useRef(_data);
+    const [result, setResult] = useState<any>();
+
+    useEffect(() => {
+
+        data.current = _data;
+        console.log(data.current);
+        
     switch (url) {
         case "/v2/account":
-            result = <AccountInfo data={data}/>
+            setResult(<AccountInfo data={data.current}/>)
             break;
         case "/v2/account/wizardsvault/daily":
-            result=  <WizVaultDaily data={data}/>
+            setResult(<WizVaultDaily data={data.current}/>)
             break;
         case "/v2/account/inventory":
-            result= <SharedInventoryInfo data={data}/>
+            setResult(<SharedInventoryInfo data={data.current}/>)
             break;
         case "/v2/characters":
-            result = <Characters data={data}/>
+            setResult(<Characters data={data.current}/>)
+            break;
+        case "/v2/account/worldbosses":
+            setResult(<div>"Testing"</div>)
             break;
         default:
-            result = <div>"Nothing to see here"</div>
+            setResult(<div>"Nothing to see here"</div>)
     }
+
+}, [_data])
+    
     return result;
 }
  

@@ -22,10 +22,10 @@ const useFetch = (
     
     
 useEffect(() =>{
+        
     const abortController = new AbortController();
     setLoading(true);
-    let timer;   
-    timer = true;
+    let timer = true;
     
     fetch(fetchLink, {signal: abortController.signal})
     .then((res) =>{
@@ -44,7 +44,6 @@ useEffect(() =>{
         setLoading(false);
         timer = false;
         setRes(null)
-
         setErr(true);
     })
 
@@ -54,12 +53,12 @@ useEffect(() =>{
             abortController.abort();
         }, 10000);
     }
-    return() => {
+    return() =>{
+        abortController.abort();
     }
 }, [currentApiKey, endpoint, setRes, setLoading, setErr])
 
         return {res, loading, err}
     }
-    
 
 export default useFetch;

@@ -47,17 +47,14 @@ const Menu = ({showApi, setShowApi} : Props) => {
     const [needApi, setNeedApi] = useState(false);
     const [subMenuOn, setSubMenuOn] = useState(false);
     const [burgerToggle, setBurgerToggle] = useState(true);
-
+    
     const {res, loading, err} = useFetch(menuEp.current, mainKey);
-    console.log(res, loading,err);
-
+    
     useEffect(() => {
         (mainKey === undefined || mainKey === null) ? setNeedApi(true) : setNeedApi(false);
-        //when a mainkey is changed, send them to Daily menu
     }, [mainKey])
 
     const handleMenuLogoClick = (index: number) => {
-           console.log(menuIcons[index].endPoint)
             menuIcons.map((icon, i) =>{
                 if(index === i){
                     icon.activeState = true;
@@ -65,7 +62,7 @@ const Menu = ({showApi, setShowApi} : Props) => {
                     icon.activeState = false;
                 }
             })
-
+            
             if(menuIcons[index].subMenu && !subMenuOn){
                 setSubMenuOn(true)
             } 
@@ -73,9 +70,10 @@ const Menu = ({showApi, setShowApi} : Props) => {
                 setSubMenuOn(false)
             }
             
-            if (mainKey && menuIcons[index].endPoint) {
+            if (menuIcons[index].endPoint) {
                 menuEp.current = (menuIcons[index].endPoint);
             }
+            
     }
 
     function handleHamburgerClick(): void {
@@ -121,7 +119,7 @@ const Menu = ({showApi, setShowApi} : Props) => {
             {
             <>
               {res && !err && !loading && subMenuOn && <SubAccountInfo subMenuOn={subMenuOn} burgerToggle={burgerToggle}/>}
-              {res && !err && !loading && !subMenuOn && <FetchedContent url={menuEp.current?.url} data={res}/>}
+              {res && !err && !loading && !subMenuOn && <FetchedContent url={menuEp.current?.url} _data={res}/>}
             </>  
             }
 

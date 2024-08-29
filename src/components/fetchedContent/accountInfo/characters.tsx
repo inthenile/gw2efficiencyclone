@@ -13,9 +13,6 @@ const Characters = ({data} : {data: any}) => {
     
 
     //output the character array
-    //THIS CAUSES AN ERROR RIGHTNOW DUE TO DATA FETCHING.
-    //THE DATA FETCHED FIRST YIELDS THE OLD DATA. FIX THAT!!
-    
     const charDisplay =  
         <ul className={styles.charList}>
             {data && data?.map((char: any, i: number) => (

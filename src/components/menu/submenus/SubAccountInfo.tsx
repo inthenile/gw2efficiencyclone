@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect,  useState } from "react";
 import { MenuIcon } from "../menuicontype";
 import { KeyArrayContext } from "../../../App";
 import walletIcon from "../../../assets/subMenus/account/wallet.png"
@@ -37,11 +37,10 @@ const SubAccountInfo = ({subMenuOn, burgerToggle} : Props) => {
         
     const keyContext = useContext(KeyArrayContext);
     const mainKey = keyContext?.isMainKey;
-
     const [menuEp, setMenuEp] = useState<EndpointType>({url:"/v2/account", keyReq: true});
-
     const {res, loading, err} = useFetch(menuEp, mainKey)
-    console.log(res, loading,err);
+
+    
     //if the main Account icon is clicked while having another submenu (other than overview) is selected - this will reset the selection to overview.
     useEffect(() => {
         document.getElementById("account-info")?.addEventListener("click", () => handleSubMenuLogoClick(0))
@@ -77,7 +76,7 @@ return (
         </div>
 
         {res && !loading && !err && subMenuOn &&
-        <FetchedContent url={menuEp?.url} data={res} />}
+        <FetchedContent url={menuEp?.url} _data={res} />}
         
         {loading && !err && subMenuOn &&
             <div className={styles.loadingDiv}>

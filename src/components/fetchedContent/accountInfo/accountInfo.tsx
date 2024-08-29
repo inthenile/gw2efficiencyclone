@@ -8,8 +8,6 @@ import { useEffect, useState } from "react"
 import styles from "./accountInfo.module.css"
 import spinner from "../../../assets/spinner.png";
 
-const abortController = new AbortController();
-
 let expansions: React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>[] = [];
 let accName: string = "";
 let creationDate: string = "";
