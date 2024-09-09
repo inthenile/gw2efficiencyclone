@@ -141,7 +141,7 @@ const AccountInfo = ({data: data} : any) => {
     return ( 
         <>
             {!err && fetching &&
-            <div className={styles.loadingDiv}> 
+            <div className="loadingDiv"> 
                 <img src={spinner} alt="loading logo" /> 
                 <h2>Loading...</h2>
             </div>}

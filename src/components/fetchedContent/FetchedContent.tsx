@@ -17,7 +17,6 @@ const FetchContent = ({url, _data}: Props) => {
     useEffect(() => {
 
         data.current = _data;
-        console.log(data.current);
         
     switch (url) {
         case "/v2/account":

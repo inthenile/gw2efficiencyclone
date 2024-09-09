@@ -52,9 +52,16 @@ const Menu = ({showApi, setShowApi} : Props) => {
     
     useEffect(() => {
         (mainKey === undefined || mainKey === null) ? setNeedApi(true) : setNeedApi(false);
+        handleMenuLogoClick(0);
     }, [mainKey])
 
     const handleMenuLogoClick = (index: number) => {
+
+            //THERE SEEMS TO BE A PROBLEM WITH THE MENU ICONS
+            //THEY CAN ONLY BE SELECTED IN TURNS
+            //IF AN ICON DOESNT HAVE A SUBMENU, IT CANNOT BE SELECTED WHILE A SUBMENU ICON IS SELECTED
+            //IF AN ICON DOESNT HAVE A SUBMENU, IT CANNOT BE SELECTED WHILE A MENU THAT DOESNT HAVE A SUBMENU IS SELECTED.
+            //????????????????????????????
             menuIcons.map((icon, i) =>{
                 if(index === i){
                     icon.activeState = true;
@@ -124,7 +131,7 @@ const Menu = ({showApi, setShowApi} : Props) => {
             }
 
             {loading && !err && !subMenuOn &&
-            <div className={styles.loadingDiv}> 
+            <div className="loadingDiv"> 
                 <img src={spinner} alt="loading logo" /> 
                 <h2>Loading...</h2>
             </div>}

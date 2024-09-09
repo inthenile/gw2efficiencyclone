@@ -16,9 +16,9 @@ const useFetch = (
     const baseUrl = "https://api.guildwars2.com";
     const fetchLink = endpoint?.keyReq 
     ? 
-    `${baseUrl}${endpoint?.url}?access_token=${currentApiKey?.key}`
+    `${baseUrl}${endpoint?.url}?access_token=${currentApiKey?.key}&v=latest`
     :
-    `${baseUrl}${endpoint?.url}`
+    `${baseUrl}${endpoint?.url}&v=latest`
     
     
 useEffect(() =>{

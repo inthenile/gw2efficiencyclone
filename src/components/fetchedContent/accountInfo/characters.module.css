@@ -1,9 +1,52 @@
 .charList{
     list-style: none;
+    padding: 0;
 }
 
 .charListItem{
-    background-color: beige;
-    margin: 10px;
+    background-color: rgb(245, 225, 200);
+    margin: 10px auto;
+    text-align: center;
+    padding: 10px 0px;
+}
+.charListItem:hover{
+    cursor: pointer;
+    background-color: orange;
+    color: white;
+}
+.professionIcon{
+    width: 70px;
+    margin: 0;
+}
+.mainInfo{
+    text-align: center;
+}
+.buttonWrapper{
+    align-items: center;
+}
+.statistics{
+
+}
+.backButton{
+    color: orange;
+    font-size:20;
+    display: flex;
+    justify-content:flex-end;
+}
+.backButton:hover{
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+@media screen and (min-width : 800px) {
     
+    .charList{
+        grid-template-columns: 1fr 1fr ;
+        display: grid;
+        gap: 10px;
+        margin: 0 auto;
+    }
+    .charListItem{
+        width: 100%
+    }
 }

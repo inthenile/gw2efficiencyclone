@@ -79,7 +79,7 @@ return (
         <FetchedContent url={menuEp?.url} _data={res} />}
         
         {loading && !err && subMenuOn &&
-            <div className={styles.loadingDiv}>
+            <div className="loadingDiv"> 
                 <img src={spinner} alt="loading logo" /> 
                 <h2>Loading...</h2>
             </div>}

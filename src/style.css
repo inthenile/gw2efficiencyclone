@@ -24,6 +24,31 @@ a:hover{
     cursor: pointer;
 }
 
+.loadingDiv{
+    margin-top: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.loadingDiv img{
+    width: 80px;
+    height: 80px;
+    margin: 0;
+    animation: rotation 1s infinite linear;
+}
+.loadingDiv h2{
+    opacity: 50%;
+}
+@keyframes rotation {
+    from{
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(359deg);
+    }
+}
+
 @media only screen and (min-width: 768px) {body{
     width: 70%;
     margin: 0 auto;
