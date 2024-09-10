@@ -12,4 +12,8 @@ This is an update to the initial <a href="https://github.com/inthenile/gw2api">G
 4- Save your api key and use the search options!
 ```
 
+# Screenshots
+
+![mobile responsive](public/screenshots/mobile_responsive.png)
+![api key window](public/screenshots/api_keys.png.png)
 

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import AccountInfo from "./accountInfo/accountInfo";
-import Characters from "./accountInfo/characters";
+import Characters from "./accountInfo/characters/characters";
 import SharedInventoryInfo from "./accountInfo/sharedInventoryInfo";
 import WizVaultDaily from "./accountInfo/wizVaultDaily";
 

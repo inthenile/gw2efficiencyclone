@@ -1,18 +1,18 @@
 import { useContext, useEffect, useState } from "react";
-import { KeyArrayContext } from "../../../App";
-import { ApiKeyType } from "../../api/apitype";
+import { KeyArrayContext } from "../../../../App";
+import { ApiKeyType } from "../../../api/apitype";
 import styles from "./characters.module.css";
-import warriorIcon from "./../../../assets/classes/warrior.png"
-import guardIcon from "./../../../assets/classes/guardian.png"
-import revIcon from "./../../../assets/classes/revenant.png"
-import engiIcon from "./../../../assets/classes/engineer.png"
-import rangerIcon from "./../../../assets/classes/ranger.png"
-import thiefIcon from "./../../../assets/classes/thief.png"
-import mesmerIcon from "./../../../assets/classes/mesmer.png"
-import elementalistIcon from "./../../../assets/classes/elementalist.png"
-import necroIcon from "./../../../assets/classes/necromancer.png"
-
-import spinner from "../../../assets/spinner.png";
+import warriorIcon from     "./../../../../assets/classes/warrior.png"
+import guardIcon from       "./../../../../assets/classes/guardian.png"
+import revIcon from         "./../../../../assets/classes/revenant.png"
+import engiIcon from        "./../../../../assets/classes/engineer.png"
+import rangerIcon from      "./../../../../assets/classes/ranger.png"
+import thiefIcon from       "./../../../../assets/classes/thief.png"
+import mesmerIcon from      "./../../../../assets/classes/mesmer.png"
+import elementalistIcon from"./../../../../assets/classes/elementalist.png"
+import necroIcon from       "./../../../../assets/classes/necromancer.png"
+import spinner from "../../../../assets/spinner.png";
+import Equipment  from "./Equipment";
 
 const Characters = ({data} : {data: any}) => {
 
@@ -64,7 +64,6 @@ export const SingleCharacter  = ({character, apiKey, setLoading, setSelectedChar
         setSelectedChar("");
         setLoading(false);
     }
-
 
     const abortController = new AbortController();
 
@@ -148,29 +147,29 @@ export const SingleCharacter  = ({character, apiKey, setLoading, setSelectedChar
         console.log(infoArray);
 
         //some calculations
-        
         const playedHour = infoArray ? infoArray.age / (60*60) : 0;
         const playedMinute = infoArray ? infoArray.age / (60) : 0;
         const leftoverMins = playedMinute % 60;
         
-        const inventorySize = infoArray ? infoArray.bags.reduce((total, currValue) => {
-            return total + currValue.size;
-        }, 0) : 0;
-        //don't count null (empty) inventory spaces
-        const usedSpace = infoArray ? infoArray.bags.reduce((total, currValue) => {
-            if (currValue.inventory.map(item => {
+        const inventorySize = infoArray?.bags.reduce((total, currValue) => {
+            currValue !== null ? total += currValue.size : total += 0;
+            return total;
+        }, 0);
+        //don't count null (empty) inventory spaces 
+        const usedSpace = infoArray?.bags.reduce((total, currValue) => {
+            if (currValue?.inventory.map(item => {
                 item !== null ? total += 1 : total += 0;
             })) {
             }
             return total;
-        }, 0) : 0;
-        const bagSize = infoArray ? infoArray.bags.length : 0;
+        }, 0);
+        const bagSize = infoArray?.bags.length;
         const maxBagSize = 15;
 
 
         return(
             <div>
-                {infoArray &&
+                {infoArray && !err &&
                 <>
                     <div className={styles.buttonWrapper}>
                         <div onClick={() => handleGoBack()} className={styles.backButton}>&lt; Character selection</div>
@@ -198,7 +197,6 @@ export const SingleCharacter  = ({character, apiKey, setLoading, setSelectedChar
                         </div>
 
                         <div className={styles.equipment}>
-                            <h5>Equipment</h5>
                             <>
                             {<Equipment charName={infoArray.name} />}
                             </>
@@ -208,43 +206,5 @@ export const SingleCharacter  = ({character, apiKey, setLoading, setSelectedChar
                 </>
                     }
             </div>
-    )
-}
-
-export const Equipment = ({charName: charName} : {charName: string}) => {
-
-    const [tabNumber, setTabNumber] = useState(1);
-    const [equipment, setEquipment] = useState();
-
-    //still unsure how to go about this. 
-    useEffect(() => {
-        //to see how many tabs there are
-        fetch(`https://api.guildwars2.com/v2/characters/${charName}/equipmenttabs?access_token=${key?.key}`)
-        .then(res =>{
-            return res.json();            
-        }).then(data =>{
-            console.log(data);
-        })
-    }, [])
-
-    const keyContext = useContext(KeyArrayContext)
-    const key = keyContext?.isMainKey;
-
-    //not all items are supported by the API
-    function fetchItems(){
-        
-        // fetch(`https://api.guildwars2.com/v2/items?ids=${itemArray},`)
-        fetch(`https://api.guildwars2.com/v2/characters/${charName}/equipmenttabs/${tabNumber}?access_token=${key?.key}`)
-            .then(res =>{
-                return res.json();
-            }).then(data =>{
-                console.log(data);
-            })
-    }
-    fetchItems()
-
-    return (
-        <>
-        </>
     )
 }

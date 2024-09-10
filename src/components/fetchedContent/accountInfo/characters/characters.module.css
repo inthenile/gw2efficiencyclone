@@ -20,6 +20,8 @@
 }
 .mainInfo{
     text-align: center;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
 }
 .buttonWrapper{
     align-items: center;

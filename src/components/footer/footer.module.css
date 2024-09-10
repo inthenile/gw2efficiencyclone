@@ -4,6 +4,7 @@
 }
 .footer-container img{
     margin: 0;
+    width: 75%;
 }
 .footer-container{
     gap: 10px;
