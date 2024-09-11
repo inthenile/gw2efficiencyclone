@@ -61,7 +61,7 @@ const Header = ( {showApi, setShowApi} : {showApi: boolean, setShowApi: React.Di
             <div className={styles["header-container"]}>
                 <img src={logo} alt="gw2 efficiency logo" onClick={handleLogoClick} id="gw2e-logo"/>
                 <span className={styles["api-keys"]} onClick={handleApiClick}>API Keys</span>
-                <span className="select-account"> Account:  
+                <span className={styles["select-account"]}> Account:  
                         <select id="select" onChange={(e) => handleOptionChange(e)} defaultValue={mainKey?.key} >
                     {savedKeys && savedKeys.map((key, index) => (
                         <option key={index} value={key.key}> {key.accountName} </option>

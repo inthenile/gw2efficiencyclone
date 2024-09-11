@@ -36,8 +36,8 @@ color: var(--primary);
     .header-container h1{
         font-size: 1.2em;
     }
-    .header-container h3{
-        display: none;
+    .select-account{
+        margin-top: 25px;
     }
     .header-container img{
         width: 80%;

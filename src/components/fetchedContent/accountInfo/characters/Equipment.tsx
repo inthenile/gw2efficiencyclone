@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { KeyArrayContext } from "../../../../App";
 import styles from "./equipment.module.css"
 import placeholder from "./../../../../assets/placeholder.png"
@@ -11,14 +11,21 @@ type ItemType = {
     name: string,
     rarity: string,
     id: number,
-    slot?: string,
+    slot: string,
+}
+
+type TabType = {
+    name: string,
+    items: {id: number, slot: string}[],
+    tabNumber: number
 }
 
 const Equipment = ({charName: charName} : {charName: string}) => {
 
     const keyContext = useContext(KeyArrayContext)
     const key = keyContext?.isMainKey;
-    const [tabAmount, setTabAmount] = useState<string[]>();
+
+    const [tabs, setTabs] = useState<TabType[]>([]);
     const [tabNumber, setTabNumber] = useState<string>("1");
     const [items, setItems] = useState<ItemType[]>([]);
     const [itemIds, setItemIds] = useState<number[]>([])
@@ -27,21 +34,24 @@ const Equipment = ({charName: charName} : {charName: string}) => {
 
     useEffect(() => {
         //to see how many tabs there are and save them in an array
-        fetch(`https://api.guildwars2.com/v2/characters/${charName}/equipmenttabs?access_token=${key?.key}&v=latest`)
+        fetch(`https://api.guildwars2.com/v2/characters/${charName}/equipmenttabs?access_token=${key?.key}&tabs=all`)
+
         .then(res =>{
             return res.json();            
         }).then(data =>{
-            console.log(data);
-            setTabAmount(data);
+            data.map((x: any) => {
+                setTabs(t => [...t, {items: x.equipment, name: x.name, tabNumber: x.tab}])
+            })
         })
     }, [])
+
     useEffect(() =>{
         fetchEquipmentTabs()
-        return() => {
-            setItems([]);
-            setSlots([]);
-            setErr(false);
-        }
+            return() => {
+                setItems([]);
+                setSlots([]);
+                setErr(false);
+            }
     }, [tabNumber, setTabNumber])
 
     useEffect(() => {
@@ -56,18 +66,14 @@ const Equipment = ({charName: charName} : {charName: string}) => {
                     return res.json();
                 }
             }).then(data =>{
-                
                 const duplicateItems = itemIds.filter((item, i) => itemIds.indexOf(item) !== i)
-                
                 if (duplicateItems.length) {
                     checkDuplicates(data, duplicateItems);
                 } else {
                     setItems(data);
                 }
             })
-
-    }
-
+        }
     }
     //DUPLLICATE IDS ARE CAUSING PROBLEMS: multiple objects with the same item ids are not fetched with the fetchItems function
     //with this function we create duplicates if the same id exists in our array
@@ -92,7 +98,6 @@ const Equipment = ({charName: charName} : {charName: string}) => {
                     setErr(true);
                 } else {
                     data.equipment.map((item:any)=> {
-                        console.log(item);
                         setItemIds(i => [...i, item.id]);
                         setSlots((i: any) => [...i, {slot:item.slot, item:item.id}])
                     });
@@ -107,14 +112,14 @@ const Equipment = ({charName: charName} : {charName: string}) => {
 
     return (
         <>
-            {tabAmount && 
+            {tabs.length !== 0 && 
             <>
                 <>
                     <h5>Equipment</h5>
                     <label> Equipment tab: </label>
                     <select name="tabnum" id="tabnum" onChange={(e) => handleTabChange(e)}>
-                        {tabAmount.map((num, i) => (
-                        <option value={num} key={i}> {num} </option>
+                        {tabs.map((tab, i) => (
+                        <option value={tab.tabNumber} key={i}> {tab.name ? tab.name : i+1} </option>
                         ))}
                     </select>
                 </>
@@ -146,7 +151,32 @@ export const EquipmentLayout = ({items, slots} : EquipmentProp) =>{
         "HelmAquatic", "WeaponAquaticA", "WeaponAquaticB"
     ]
 
+    const initialIcons = {
+        Helm:           <img src={placeholder}></img>,
+        Shoulders:     <img src={placeholder}></img>,
+        Coat:          <img src={placeholder}></img>,
+        Gloves:        <img src={placeholder}></img>,
+        Leggings:      <img src={placeholder}></img>,
+        Boots:         <img src={placeholder}></img>,
+        WeaponA1 :      <img src={placeholder}></img>,
+        WeaponA2 :      <img src={placeholder}></img>,
+        WeaponB1 :      <img src={placeholder}></img>,
+        WeaponB2 :      <img src={placeholder}></img>,
+        Backpack :      <img src={placeholder}></img>,
+        Accessory1 :    <img src={placeholder}></img>,
+        Accessory2 :    <img src={placeholder}></img>,
+        Amulet:        <img src={placeholder}></img>,
+        Ring1:         <img src={placeholder}></img>,
+        Ring2:         <img src={placeholder}></img>,
+        HelmAquatic:   <img src={placeholder}></img>,
+        WeaponAquaticA: <img src={placeholder}></img>,
+        WeaponAquaticB: <img src={placeholder}></img>
+     }
+    const [icons, setIcons] = useState<{[key: string]: any}>(initialIcons)
+
+
     useEffect(()=>{
+
         {items.length && slots.map((slot) => {
            allSlots.includes(slot.slot) ? setEquippedSlots(s => [...s, {slot: slot.slot, item: items.filter(item => {
                 return item.id === slot.item;
@@ -157,87 +187,75 @@ export const EquipmentLayout = ({items, slots} : EquipmentProp) =>{
         }
     }, [items])
 
-    let helmIcon =                  <img src={placeholder}></img>
-    let shoulderIcon =              <img src={placeholder}></img>
-    let chestIcon =                 <img src={placeholder}></img>
-    let glovesIcon =                <img src={placeholder}></img>
-    let legsIcon =                  <img src={placeholder}></img>
-    let bootsIcon =                 <img src={placeholder}></img>
-    let weapona1icon =              <img src={placeholder}></img>
-    let weapona2icon =              <img src={placeholder}></img>
-    let weaponb1icon =              <img src={placeholder}></img>
-    let weaponb2icon =              <img src={placeholder}></img>
-    let backIcon =                  <img src={placeholder}></img>
-    let accessory1icon =            <img src={placeholder}></img>
-    let accessory2icon =            <img src={placeholder}></img>
-    let amuletIcon =                <img src={placeholder}></img>
-    let ring1Icon =                 <img src={placeholder}></img>
-    let ring2Icon =                 <img src={placeholder}></img>
-    let aquaticHelmIcon =           <img src={placeholder}></img>
-    let weaponaquaticaIcon =        <img src={placeholder}></img>
-    let weaponaquaticbIcon =        <img src={placeholder}></img>
+    
+    useEffect(() => {
+        {equippedSlots.length && handleIcons(equippedSlots)}
+        
+        return() =>{
+            setIcons(initialIcons)
+        }
+
+    }, [equippedSlots, setEquippedSlots])
+    
+
+    function handleIcons(equippedSlots: {slot: string, item: any}[]){
+        let nextIcons: any = {...icons};
+        const keys = Object.keys(icons).map(slot => {
+            return slot;
+        });
+
+        for (let i = 0; i < equippedSlots.length; i++) {
+            const slot = equippedSlots[i].slot;
+            if (keys.includes(slot) ) {
+                equippedSlots.forEach(_slot => {
+                    if (_slot.slot === slot) {
+                        nextIcons[slot] = <img src={_slot.item[0]?.icon} ></img>;
+                    } 
+                })
+            }
+        }
+        setIcons(nextIcons);
+    }
 
     useEffect(()=>{
-        equippedSlots?.map(slot => {
-            //REFACTOR THIS
-            if (slot.slot === "Helm")           helmIcon =              <img src={slot.item[0].icon} ></img>
-            if (slot.slot === "Shoulders")      shoulderIcon =          <img src={slot.item[0].icon} ></img>
-            if (slot.slot === "Gloves")         glovesIcon =            <img src={slot.item[0].icon} ></img>
-            if (slot.slot === "Coat")           chestIcon =             <img src={slot.item[0].icon} ></img>
-            if (slot.slot === "Leggings")       legsIcon =              <img src={slot.item[0].icon} ></img>
-            if (slot.slot === "Boots")          bootsIcon =             <img src={slot.item[0].icon} ></img>
-            if (slot.slot === "WeaponA1")       weapona1icon =          <img src={slot.item[0].icon} ></img>
-            if (slot.slot === "WeaponA2")       weapona2icon =          <img src={slot.item[0].icon} ></img>
-            if (slot.slot === "WeaponB1")       weaponb1icon =          <img src={slot.item[0].icon} ></img>
-            if (slot.slot === "WeaponB2")       weaponb2icon =          <img src={slot.item[0].icon} ></img>
-            if (slot.slot === "Backpack")       backIcon=               <img src={slot.item[0].icon} ></img>
-            if (slot.slot === "Accessory1")     accessory1icon =        <img src={slot.item[0].icon} ></img>
-            if (slot.slot === "Accessory2")     accessory2icon=         <img src={slot.item[0].icon} ></img>
-            if (slot.slot === "Amulet")         amuletIcon=             <img src={slot.item[0].icon} ></img>
-            if (slot.slot === "Ring1")          ring1Icon =             <img src={slot.item[0].icon} ></img>
-            if (slot.slot === "Ring2")          ring2Icon =             <img src={slot.item[0].icon} ></img>
-            if (slot.slot === "HelmAquatic")    aquaticHelmIcon=        <img src={slot.item[0].icon} ></img>
-            if (slot.slot === "WeaponAquaticA") weaponaquaticaIcon =    <img src={slot.item[0].icon} ></img>
-            if (slot.slot === "WeaponAquaticB") weaponaquaticbIcon =    <img src={slot.item[0].icon} ></img>
-        })
 
         setLayout(
                 <div className={styles.equipment}>
                 <div className={styles.armour}>
-                    {helmIcon}
-                    {shoulderIcon}
-                    {glovesIcon}
-                    {chestIcon}
-                    {legsIcon}
-                    {bootsIcon}
+                    {icons.Helm}
+                    {icons.Shoulders}
+                    {icons.Coat}
+                    {icons.Gloves}
+                    {icons.Leggings}
+                    {icons.Boots}
                 </div>
                 <div className={styles.weapons}>
-                    {weapona1icon}
-                    {weapona2icon}
-                    {weaponb1icon}
-                    {weaponb2icon}
+                    {icons.WeaponA1}
+                    {icons.WeaponA2}
+                    {icons.WeaponB1}
+                    {icons.WeaponB2}
                 </div>
                 <div className={styles.trinkets}>
-                    {backIcon}
-                    {accessory1icon}
-                    {accessory2icon}
-                    {amuletIcon}
-                    {ring1Icon}
-                    {ring2Icon}
+                    {icons.Backpack}
+                    {icons.Accessory1}
+                    {icons.Accessory2}
+                    {icons.Amulet}
+                    {icons.Ring1}
+                    {icons.Ring2}
                 </div>
                 <div className={styles.aquatic}>
-                    {aquaticHelmIcon}
-                    {weaponaquaticaIcon}
-                    {weaponaquaticbIcon}
+                    {icons.HelmAquatic}
+                    {icons.WeaponAquaticA}
+                    {icons.WeaponAquaticB}
                 </div>
             </div>
             )
 
-    }, [equippedSlots, setEquippedSlots])
+    }, [equippedSlots, setEquippedSlots, icons, setIcons])
 
     return(
         <div> 
-            {layout}
+            {equippedSlots && icons && layout && layout}
         </div>
 
     )
