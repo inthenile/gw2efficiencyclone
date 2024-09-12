@@ -11,6 +11,10 @@
 
 .equipment{
 }
+.equipmentCard{
+    display: grid;
+    background-color: rgba(0, 0, 0, 0.596);
+}
 .weapons{
     grid-area: weapons;
 }

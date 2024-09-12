@@ -41,7 +41,6 @@ const Equipment = ({charName: charName} : {charName: string}) => {
         }).then(data =>{
             const {active_equipment_tab} = data;
             const {equipment_tabs} = data;
-            const {equipment} = data;
             
             setTabNumber(active_equipment_tab)
             equipment_tabs.map((tab: TabType) => {
@@ -109,7 +108,6 @@ const Equipment = ({charName: charName} : {charName: string}) => {
                 }             
             })
         }
-
     }
 
     function handleTabChange(e: React.ChangeEvent<HTMLSelectElement>){
@@ -154,7 +152,6 @@ export const EquipmentLayout = ({items, slots} : EquipmentProp) =>{
 
     const [layout, setLayout] = useState<any>();
     const [equippedSlots, setEquippedSlots] = useState<{slot: string, item: any}[]>([]);
-
 
     const initialIcons = {
         Helm:           {image: <img src={placeholder}></img>, description:""},
@@ -204,14 +201,8 @@ export const EquipmentLayout = ({items, slots} : EquipmentProp) =>{
     
 
     function handleMouseEnter(item: EquippedSlotType, eqIcon: any){
-        eqIcon.description =  <div className={styles.activeCard}> {item.item[0].name} </div>
         const element = document.getElementById(item.slot);
         element?.classList.remove("inactiveCard");
-        console.log(eqIcon);
-        const {name, icon, rarity, level, details, description} = item.item[0];
-        const {type, weight_class} = details;
-        const card = {name, icon, rarity, level, description, type, weight_class};
-
     }
     function handleMouseExit(item: EquippedSlotType){
 
@@ -252,15 +243,12 @@ export const EquipmentLayout = ({items, slots} : EquipmentProp) =>{
                             default:
                                 borderColor = "white";
                     }
-                    console.log(slot);
-                    console.log(_slot);
-                    console.log(item[0]);
-                    
+
                     
                     nextIcons[slot] = {image: <img  onMouseEnter={() => handleMouseEnter(_slot, nextIcons[slot])}
                                                     onMouseLeave={() => handleMouseExit(_slot)} 
                                                     style={{border: `${borderColor} 2px solid`}} src={_slot.item[0]?.icon}></img>,
-                                        description: <div id={_slot.slot}className="inactiveCard"> {_slot.item[0].name} </div>};
+                                        description: <div id={_slot.slot}className="inactiveCard"> <EquipmentCard item={item[0]}/> </div>};
                 } 
             })
         }
@@ -319,7 +307,22 @@ export function EquipmentCard({item}: {item: ItemType}){
 
         console.log(card);
         return(
-            <h1>Yes</h1>
+            <>
+            <div className={styles.equipmentCard}>
+                {card.name}
+                <br></br>
+                <img src={card.icon} alt="item icon" />
+                <br></br>
+                <span>Required level: {card.level}</span>
+                <br></br>
+                {card.rarity}
+                <br></br>
+           
+                {card.weight_class}
+                <br></br>
+                {card.description}
+            </div>
+            </>
         )
     }
     
