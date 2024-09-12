@@ -24,6 +24,13 @@ a:hover{
     cursor: pointer;
 }
 
+.inactiveCard{
+    display: none;
+}
+.activeCard{
+    display: block;
+}
+
 .loadingDiv{
     margin-top: 80px;
     display: flex;
