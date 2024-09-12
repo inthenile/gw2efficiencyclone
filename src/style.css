@@ -28,7 +28,7 @@ a:hover{
     display: none;
 }
 .activeCard{
-    display: block;
+    position: relative;
 }
 
 .loadingDiv{

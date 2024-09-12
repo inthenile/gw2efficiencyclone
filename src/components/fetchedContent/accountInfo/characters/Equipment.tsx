@@ -1,4 +1,4 @@
-import React, { act, useContext, useEffect, useState } from "react";
+import React, {useContext, useEffect, useState } from "react";
 import { KeyArrayContext } from "../../../../App";
 import styles from "./equipment.module.css"
 import placeholder from "./../../../../assets/placeholder.png"
@@ -6,13 +6,21 @@ import placeholder from "./../../../../assets/placeholder.png"
 type ItemType = {
     default_skin: number,
     description: string,
-    details: {type?: string, weight_class?: string, infix_upgrade?: { attributes: [{atttribute: string, modifier: number}]}},
+    details: 
+        {
+            type?: string,
+            weight_class?: string,
+            max_power?: number,
+            min_power?: number
+            defense?: number
+        },
     icon: string,
     name: string,
     rarity: string,
     id: number,
     slot: string,
     level?: number
+    flags?: string[]
 }
 
 type TabType = {
@@ -21,6 +29,24 @@ type TabType = {
     tab: number,
 }
 
+function findItemColor(rarity: string){
+    switch(rarity){
+        case "Fine":
+            return "blue";
+        case "Masterwork":
+            return "green";
+        case "Rare":    
+            return "yellow";
+        case "Exotic":
+            return "darkorange";
+        case "Ascended":
+            return "#e768cc";
+        case "Legendary":
+            return "#7f17b3";
+        default:
+            return "white";
+}
+}
 const Equipment = ({charName: charName} : {charName: string}) => {
 
     const keyContext = useContext(KeyArrayContext)
@@ -34,7 +60,6 @@ const Equipment = ({charName: charName} : {charName: string}) => {
     const [slots, setSlots] = useState<{slot: string, item: number}[]>([]);
 
     useEffect(() => {
-        //to see how many tabs there are and save them in an array
         fetch(`https://api.guildwars2.com/v2/characters/${charName}?access_token=${key?.key}&v=latest`)
         .then(res =>{
             return res.json();            
@@ -117,17 +142,15 @@ const Equipment = ({charName: charName} : {charName: string}) => {
 
     return (
         <>
-            {tabs.length !== 0 && 
+            {tabs.length !== 0 && slots && !err &&
             <>
-                <>
-                    <h5>Equipment</h5>
-                    <label> Equipment tab: </label>
-                    <select  defaultValue={tabNumber} name="tabnum" id="tabnum" onChange={(e) => handleTabChange(e)}>
-                        {tabs.map((tab, i) => (
-                        <option value={tab.tab} key={i}> {tab.name ? tab.name : tab.tab} </option>
-                        ))}
-                    </select>
-                </>
+                <h5>Equipment</h5>
+                <label> Equipment tab: </label>
+                <select  defaultValue={tabNumber} name="tabnum" id="tabnum" onChange={(e) => handleTabChange(e)}>
+                    {tabs.map((tab, i) => (
+                    <option value={tab.tab} key={i}> {tab.name ? tab.name : tab.tab} </option>
+                    ))}
+                </select>
                 {equippedItems && !err && <EquipmentLayout items={equippedItems} slots={slots}/>}
             </>
             }
@@ -139,7 +162,6 @@ const Equipment = ({charName: charName} : {charName: string}) => {
 }
 export default Equipment;
 
-//LAYOUT FOR EQUIPMENT DISPLAY
 type EquipmentProp = {
     items: ItemType[],
     slots: {slot:string, item:number}[]
@@ -178,7 +200,6 @@ export const EquipmentLayout = ({items, slots} : EquipmentProp) =>{
 
      
     useEffect(()=>{
-
         {items.length && slots.map((slot) => {
            setEquippedSlots(s => [...s, {slot: slot.slot, item: items.filter(item => {
                 return item.id === slot.item;
@@ -189,94 +210,73 @@ export const EquipmentLayout = ({items, slots} : EquipmentProp) =>{
         }
     }, [items])
 
-    
     useEffect(() => {
         {equippedSlots.length && handleIcons(equippedSlots)}
-        
         return() =>{
             setIcons(initialIcons)
         }
-
     }, [equippedSlots, setEquippedSlots])
     
 
+    useEffect(() => {
+        const test = document.getElementById("test")?.getBoundingClientRect();
+        console.log(test);
+    },[handleMouseEnter, handleMouseExit])
     function handleMouseEnter(item: EquippedSlotType){
         const element = document.getElementById(item.slot);
         element?.classList.remove("inactiveCard");
+        element?.classList.add("activeCard");
     }
     function handleMouseExit(item: EquippedSlotType){
-
         const element = document.getElementById(item.slot);
         element?.classList.add("inactiveCard");
-
+        element?.classList.remove("activeCard");
     }
+
     function handleIcons(equippedSlots: EquippedSlotType[]){
         let nextIcons: any = {...icons};
         
                 equippedSlots.forEach(_slot => {
-                        const {item} = _slot;
-                        let borderColor;
-                        switch(_slot.item[0]?.rarity){
-                            case "Fine":
-                                borderColor = "blue";
-                                break;
-                            case "Masterwork":
-                                borderColor = "green";
-                                break;
-                            case "Rare":    
-                                borderColor = "yellow";
-                                break;
-                            case "Exotic":
-                                borderColor = "darkorange";
-                                break;
-                            case "Ascended":
-                                borderColor = "fuchsia";
-                                break;
-                            case "Legendary":
-                                borderColor = "purple";
-                                break;
-                            default:
-                                borderColor = "white";
-                    }
-
-                    
-                    nextIcons[_slot.slot] = {image: <img  onMouseEnter={() => handleMouseEnter(_slot)}
-                                                    onMouseLeave={() => handleMouseExit(_slot)} 
-                                                    style={{border: `${borderColor} 2px solid`}} src={_slot.item[0]?.icon}></img>,
-                                        description: <div id={_slot.slot}className="inactiveCard"> <EquipmentCard item={item[0]}/> </div>};
+                    const borderColor = findItemColor(_slot.item[0].rarity)
+                    nextIcons[_slot.slot] = {image: <img    onMouseEnter={() => handleMouseEnter(_slot)} 
+                                                            onMouseLeave={() => handleMouseExit(_slot)} 
+                                                            style={{border: `${borderColor} 2px solid`}} src={_slot.item[0]?.icon}></img>,
+                                            description: <span id={_slot.slot}  className="inactiveCard"> <EquipmentCard item={_slot.item[0]}/> </span>};
             })
         setIcons(nextIcons);
     }
 
+
     useEffect(()=>{
+
         setLayout(
             <div className={styles.equipment}>
                 <div className={styles.armour}>
-                    <div>{icons.Helm.image}  </div>     {icons.Helm.description}
-                    <div>{icons.Shoulders.image}</div>  {icons.Shoulders.description} 
-                    <div>{icons.Coat.image}     </div>  {icons.Coat.description}   
-                    <div>{icons.Gloves.image}   </div>  {icons.Gloves.description} 
-                    <div>{icons.Leggings.image} </div>  {icons.Leggings.description} 
-                    <div>{icons.Boots.image}    </div>  {icons.Boots.description} 
+                    {icons.Helm.image}     {icons.Helm.description}
+                    {icons.Shoulders.image}  {icons.Shoulders.description} 
+                    {icons.Coat.image}       {icons.Coat.description}   
+                    {icons.Gloves.image}     {icons.Gloves.description} 
+                    {icons.Leggings.image}   {icons.Leggings.description} 
+                    {icons.Boots.image}      {icons.Boots.description} 
                 </div>
                 <div className={styles.weapons}>
-                    <div>{icons.WeaponA1.image}</div> {icons.WeaponA1.description}
-                    <div>{icons.WeaponA2.image}</div> {icons.WeaponA2.description}
-                    <div>{icons.WeaponB1.image}</div> {icons.WeaponB1.description}    
-                    <div>{icons.WeaponB2.image}</div> {icons.WeaponB2.description}
+                   <span> {icons.WeaponA1.image} </span>  {icons.WeaponA1.description}
+                   <span> {icons.WeaponA2.image} </span>  {icons.WeaponA2.description}
+                   <span> {icons.WeaponB1.image} </span>  {icons.WeaponB1.description}     
+                   <span> {icons.WeaponB2.image} </span>  {icons.WeaponB2.description}
                 </div>
                 <div className={styles.trinkets}>
-                    <div>{icons.Backpack.image}  </div> {icons.Backpack.description} 
-                    <div>{icons.Accessory1.image}</div> {icons.Accessory1.description}   
-                    <div>{icons.Accessory2.image}</div> {icons.Accessory2.description}
-                    <div>{icons.Amulet.image}    </div> {icons.Amulet.description} 
-                    <div>{icons.Ring1.image}     </div> {icons.Ring1.description} 
-                    <div>{icons.Ring2.image}     </div> {icons.Ring2.description} 
+                    {icons.Backpack.image}   {icons.Backpack.description} 
+                    {icons.Accessory1.image} {icons.Accessory1.description}   
+                    {icons.Accessory2.image} {icons.Accessory2.description}
+                    {icons.Amulet.image}     {icons.Amulet.description} 
+                    {icons.Ring1.image}      {icons.Ring1.description} 
+                    {icons.Ring2.image}      {icons.Ring2.description} 
                 </div>
                 <div className={styles.aquatic}>
-                    <div>{icons.HelmAquatic.image}   </div>  {icons.HelmAquatic.description} 
-                    <div>{icons.WeaponAquaticA.image}</div>  {icons.WeaponAquaticA.description} 
-                    <div>{icons.WeaponAquaticB.image}</div>  {icons.WeaponAquaticB.description} 
+                    {icons.HelmAquatic.image}     {icons.HelmAquatic.description} 
+                    {icons.WeaponAquaticA.image}  {icons.WeaponAquaticA.description} 
+                    {icons.WeaponAquaticB.image}  {icons.WeaponAquaticB.description} 
                 </div>
             </div>
             )
@@ -290,31 +290,78 @@ export const EquipmentLayout = ({items, slots} : EquipmentProp) =>{
 
     )
 }
-    //function for hovering over items
+    //component for hovering over items
 export function EquipmentCard({item}: {item: ItemType}){
-        const {name, icon, rarity, level, details, description} = item;
-        const {type, weight_class} = details;
+        const {name, icon, rarity, level, details, description, flags} = item;
+        const {type, weight_class, defense, max_power, min_power} = details;
         
-        const card = {name, icon, rarity, level, description, type, weight_class};
+        const textColor = findItemColor(rarity)
+        const itemStatus: string[] = []
+        
+        flags?.map(flag => {
+            switch (flag) {
+                case "AccountBound":
+                    itemStatus.push(flag)
+                    break;
+                case "Unique":
+                    itemStatus.push(flag)
+                    break;
+                case "SoulBindOnUse":
+                    itemStatus.push(flag)
+                    break;
+            }
+        })
+        
+        function sanitiseDescription(description: string){
+            //This function removes the <c=@flavour> </c> from the text
+            //this is a custom text color from ArenaNet. Slicing it out and giving it the colour it actually receives from this markup
+            const originalText = description;
+            if (description?.includes("<br>")) {
+                const startPos = description.indexOf("<")
+                const endPos = startPos + 4;
+                const restOfDesc = description.slice(endPos+11, -4)
+                description = description.slice(0, startPos)
+                //this is to be able to give the flavour text its blue color, while keeping the previous description white, as it should be
+                if (originalText.includes("<br>") && originalText.includes("<c=@flavor")){
+                    return <div className={styles.cardDescription}> {description}  <br/> <span style={{color: "#34b4eb"}}>{restOfDesc}</span> </div>
+                }
+            }
 
-        console.log(card);
+            if(description?.includes("<c=@flavor>") && !description.includes("<br>")){
+                const startPos = description.indexOf("<")
+                const endPos = startPos + 11;
+                const restOfDesc = description.slice(endPos, -4)
+                const startOfDesc = description.slice(0, startPos);
+                return <div className={styles.cardDescription}> {startOfDesc} <br/> <span style={{color: "#34b4eb"}}>{restOfDesc}</span> </div>
+            } else {
+                return <div className={styles.cardDescription} style={{color: "white"}}> {description} </div>
+            }
+        }   
+        const newDescription = sanitiseDescription(description);
+        const weaponStrength = `${details.min_power} - ${details.max_power}`
+
+
+
         return(
-            <>
-            <div className={styles.equipmentCard}>
-                {card.name}
-                <br></br>
-                <img src={card.icon} alt="item icon" />
-                <br></br>
-                <span>Required level: {card.level}</span>
-                <br></br>
-                {card.rarity}
-                <br></br>
-           
-                {card.weight_class}
-                <br></br>
-                {card.description}
+            <div className={styles.equipmentCard} style=
+                {{top: "-37px", left: "1px"}}
+                
+            >
+                <div className={styles.iconAndName}>
+                    <div className={styles.cardIcon}><img src={icon} alt="item icon" /></div>
+                    <div className={styles.cardName}><span style={{color: textColor}}>{name}</span></div>
+                </div>
+                {defense !== 0 && defense !== undefined && <div className={styles.cardDefense}>Armour: <span style={{color: "green"}}>{details.defense}</span></div>}
+                {min_power && max_power && <div className={styles.cardStrength}>Weapon strength: <span style={{color: "green"}}>{weaponStrength}</span></div>}
+                <div className={styles.cardRarity}>{rarity}</div>
+                <div className={styles.cardLevel}>Required level: {level}</div>
+                <div className={styles.cardWeigthClass}>{weight_class}</div>
+                <div className={styles.cardType}>{type}</div>
+                {itemStatus && itemStatus.map((status: string, i: number) => (
+                        <span key={i}>{status}</span>
+                ))}
+                {newDescription}
             </div>
-            </>
         )
     }
     

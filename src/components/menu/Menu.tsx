@@ -57,11 +57,6 @@ const Menu = ({showApi, setShowApi} : Props) => {
 
     const handleMenuLogoClick = (index: number) => {
 
-            //THERE SEEMS TO BE A PROBLEM WITH THE MENU ICONS
-            //THEY CAN ONLY BE SELECTED IN TURNS
-            //IF AN ICON DOESNT HAVE A SUBMENU, IT CANNOT BE SELECTED WHILE A SUBMENU ICON IS SELECTED
-            //IF AN ICON DOESNT HAVE A SUBMENU, IT CANNOT BE SELECTED WHILE A MENU THAT DOESNT HAVE A SUBMENU IS SELECTED.
-            //????????????????????????????
             menuIcons.map((icon, i) =>{
                 if(index === i){
                     icon.activeState = true;

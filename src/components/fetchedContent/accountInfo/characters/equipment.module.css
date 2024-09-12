@@ -1,19 +1,33 @@
 .equipment * img{
     margin: 0 1px;
     width: 50px;
-    height: 50px;
 }
 
 .weapons > img:nth-child(even){
     width: 40px;
-    height: 40px;
 }
 
-.equipment{
-}
+
 .equipmentCard{
     display: grid;
-    background-color: rgba(0, 0, 0, 0.596);
+    position: absolute;
+    min-width: 150px;
+    background-color: rgba(0, 0, 0, 0.932);
+    border: 1px rgb(247, 211, 6) solid;
+    color: white;
+}
+.iconAndName{
+    display: flex;
+    align-items: center;
+    font-size: 10px;
+}
+.cardIcon{
+    border: 1px solid white;
+}
+
+.cardName{
+    font-weight: bold;
+    font-size: 20;
 }
 .weapons{
     grid-area: weapons;
