@@ -200,7 +200,7 @@ export const EquipmentLayout = ({items, slots} : EquipmentProp) =>{
     }, [equippedSlots, setEquippedSlots])
     
 
-    function handleMouseEnter(item: EquippedSlotType, eqIcon: any){
+    function handleMouseEnter(item: EquippedSlotType){
         const element = document.getElementById(item.slot);
         element?.classList.remove("inactiveCard");
     }
@@ -210,16 +210,11 @@ export const EquipmentLayout = ({items, slots} : EquipmentProp) =>{
         element?.classList.add("inactiveCard");
 
     }
-
     function handleIcons(equippedSlots: EquippedSlotType[]){
         let nextIcons: any = {...icons};
-
-        for (let i = 0; i < equippedSlots.length; i++) {
-            const slot = equippedSlots[i].slot;
+        
                 equippedSlots.forEach(_slot => {
-                    if (_slot.slot === slot) {
                         const {item} = _slot;
-                    
                         let borderColor;
                         switch(_slot.item[0]?.rarity){
                             case "Fine":
@@ -245,18 +240,15 @@ export const EquipmentLayout = ({items, slots} : EquipmentProp) =>{
                     }
 
                     
-                    nextIcons[slot] = {image: <img  onMouseEnter={() => handleMouseEnter(_slot, nextIcons[slot])}
+                    nextIcons[_slot.slot] = {image: <img  onMouseEnter={() => handleMouseEnter(_slot)}
                                                     onMouseLeave={() => handleMouseExit(_slot)} 
                                                     style={{border: `${borderColor} 2px solid`}} src={_slot.item[0]?.icon}></img>,
                                         description: <div id={_slot.slot}className="inactiveCard"> <EquipmentCard item={item[0]}/> </div>};
-                } 
             })
-        }
         setIcons(nextIcons);
     }
 
     useEffect(()=>{
-
         setLayout(
             <div className={styles.equipment}>
                 <div className={styles.armour}>
