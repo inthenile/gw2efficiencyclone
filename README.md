@@ -16,4 +16,5 @@ This is an update to the initial <a href="https://github.com/inthenile/gw2api">G
 
 ![mobile responsive](public/screenshots/mobile_responsive.png)
 ![api key window](public/screenshots/api_keys.png)
+![equipment](public/screenshots/equipment.png)
 
