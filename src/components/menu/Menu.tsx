@@ -86,7 +86,7 @@ const Menu = ({showApi, setShowApi} : Props) => {
     useEffect(() => {
 
         function checkWindowSize() {
-            if (window.innerWidth > 700) {
+            if (window.innerWidth > 500) {
                 setBurgerToggle(true);
             } else {
                 setBurgerToggle(false);

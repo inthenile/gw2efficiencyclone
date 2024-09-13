@@ -40,7 +40,7 @@ const Characters = ({data} : {data: any}) => {
     return ( 
         <div>
             {!loading && !selectedChar && charDisplay}
-            {selectedChar && <SingleCharacter character={selectedChar} apiKey={key} setLoading={setLoading} setSelectedChar={setSelectedChar}/>}
+            {selectedChar && <SingleCharacter character={selectedChar} apiKey={key} setLoading={setLoading} loading={loading} setSelectedChar={setSelectedChar}/>}
 
             {loading &&
             <div className="loadingDiv"> 
@@ -54,9 +54,11 @@ const Characters = ({data} : {data: any}) => {
 export default Characters;
 
 
-export const SingleCharacter  = ({character, apiKey, setLoading, setSelectedChar} 
+export const SingleCharacter  = ({character, apiKey, setLoading, setSelectedChar, loading} 
     : 
-    {character: any, apiKey: ApiKeyType | undefined | null, setLoading: React.Dispatch<React.SetStateAction<boolean>>, setSelectedChar: React.Dispatch<React.SetStateAction<string>>} ) => {
+    {character: any, apiKey: ApiKeyType | undefined | null,
+        setLoading: React.Dispatch<React.SetStateAction<boolean>>, loading: boolean,
+        setSelectedChar: React.Dispatch<React.SetStateAction<string>>} ) => {
 
     const [err, setErr] = useState(false);
 
@@ -144,8 +146,6 @@ export const SingleCharacter  = ({character, apiKey, setLoading, setSelectedChar
         const splitDate = infoArray && infoArray.created?.split(/\D+/);
         const finalDate = splitDate && (`${splitDate[2]}/${splitDate[1]}/${splitDate[0]}`);
 
-        console.log(infoArray);
-
         //some calculations
         const playedHour = infoArray ? infoArray.age / (60*60) : 0;
         const playedMinute = infoArray ? infoArray.age / (60) : 0;
@@ -169,33 +169,34 @@ export const SingleCharacter  = ({character, apiKey, setLoading, setSelectedChar
 
         return(
             <div>
+                {loading &&<div className={styles.buttonWrapper}>
+                                <div onClick={() => handleGoBack()} className={styles.backButton}>&lt; Character selection</div>
+                            </div>
+                }
                 {infoArray && !err &&
                 <>
                     <div className={styles.buttonWrapper}>
                         <div onClick={() => handleGoBack()} className={styles.backButton}>&lt; Character selection</div>
-                        
                     </div>
 
                     <div className={styles.mainInfo}>
-
-                        {professionIcon}
-
-                        <div className={styles.statistics}>
-                            <p style={{fontWeight: "bolder"}}> {infoArray.name} </p>
-                            <p>{`Level ${infoArray.level} ${infoArray.race} ${infoArray.profession} `}</p>
-                            <p>{`Created at ${finalDate}`}</p>
-                            <p>{playedHour > 0 ? `Played: ${Math.floor(playedHour)} hours` : ""} {`${(Math.floor(leftoverMins))} minutes`}</p>
-                            <p>{`Inventory: ${usedSpace} / ${inventorySize}`}</p>
-                            <p>{`Bag size: ${bagSize}/${maxBagSize}`}</p>
+                        <div className={styles.statsAndDisc}>
+                            {professionIcon}
+                            <div className={styles.statistics}>
+                                <h5> {infoArray.name} </h5>
+                                <p>{`Level ${infoArray.level} ${infoArray.race} ${infoArray.profession} `}</p>
+                                <p>{`Created at ${finalDate}`}</p>
+                                <p>{playedHour > 0 ? `Played: ${Math.floor(playedHour)} hours` : ""} {`${(Math.floor(leftoverMins))} minutes`}</p>
+                                <p>{`Inventory: ${usedSpace}/${inventorySize}`}</p>
+                                <p>{`Bag size: ${bagSize}/${maxBagSize}`}</p>
+                            </div>
+                            <div className={styles.disciplines}>
+                                <h5>Disciplines</h5>
+                                {infoArray.crafting?.map((discipline, i) => (
+                                    <div key={i} style={discipline.active ? {opacity:1} : {opacity:0.5}}>{`${discipline.discipline}: ${discipline.rating}`}</div>
+                                ))}
+                            </div>
                         </div>
-
-                        <div className={styles.disciplines}>
-                            <h5>Disciplines</h5>
-                            {infoArray.crafting?.map((discipline, i) => (
-                                <div key={i} style={discipline.active ? {opacity:1} : {opacity:0.5}}>{`${discipline.discipline}: ${discipline.rating}`} </div>
-                            ))}
-                        </div>
-
                         <div className={styles.equipment}>
                             <>
                             {<Equipment charName={infoArray.name} />}

@@ -1,38 +1,56 @@
-.equipment * img{
-    margin: 0 1px;
-    width: 50px;
+.equipmentCard p, .equipmentCard p span{
+    text-align: left;
+    padding: 0;
+    font-size: 0.9em;
+} 
+.cardName{
+    font-weight: bold;  
+    margin-left: 10px;
 }
 
-.weapons > img:nth-child(even){
-    width: 40px;
+select{
+    margin: 0 auto;
 }
 
-
-.equipmentCard{
-    display: grid;
-    position: absolute;
-    min-width: 150px;
-    background-color: rgba(0, 0, 0, 0.932);
-    border: 1px rgb(247, 211, 6) solid;
-    color: white;
-}
 .iconAndName{
     display: flex;
     align-items: center;
     font-size: 10px;
 }
-.cardIcon{
+div.cardIcon > img{
+    width: 35px;
     border: 1px solid white;
 }
+.cardRarity, .cardLevel, .cardWeigthClass, .cardType, .cardStatus{
+    margin: 0;
+    padding: 0;
+}
+.equipmentCard{
+    padding: 5px;
+    width: 250px;
+    max-width: 250px;
+    min-height: 350px;
+    display: flex;
+    justify-content: space-around;
+    flex-direction: column;
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.932);
+    color: white;
+}
+.equipment{
+    margin-top: 25px;
+    text-align: center;
+}
+.cardStrength p, .cardDefense p{
+    margin: 20px 0;
+}
+@media screen and (min-width: 760px){
 
-.cardName{
-    font-weight: bold;
-    font-size: 20;
 }
-.weapons{
-    grid-area: weapons;
-}
-.armour{
-    grid-area: armour;
-}
+@media screen and (min-width: 1200px){
+    .equipment > div img{
+        width: 50px;
+        }
 
+
+}

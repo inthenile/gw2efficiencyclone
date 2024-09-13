@@ -142,20 +142,23 @@ const Equipment = ({charName: charName} : {charName: string}) => {
 
     return (
         <>
-            {tabs.length !== 0 && slots && !err &&
+            {tabs.length !== 0 && slots &&
             <>
-                <h5>Equipment</h5>
-                <label> Equipment tab: </label>
-                <select  defaultValue={tabNumber} name="tabnum" id="tabnum" onChange={(e) => handleTabChange(e)}>
-                    {tabs.map((tab, i) => (
-                    <option value={tab.tab} key={i}> {tab.name ? tab.name : tab.tab} </option>
-                    ))}
-                </select>
+                <div style={{textAlign: "center"}} >
+                    <h5 style={{textAlign: "center"}}>Equipment</h5>
+                    <label> Equipment tab: </label>
+                    <select  defaultValue={tabNumber} name="tabnum" id="tabnum" onChange={(e) => handleTabChange(e)}>
+                        {tabs.map((tab, i) => (
+                        <option value={tab.tab} key={i}> {tab.name ? tab.name : tab.tab} </option>
+                        ))}
+                    </select>
+                </div>
+
                 {equippedItems && !err && <EquipmentLayout items={equippedItems} slots={slots}/>}
             </>
             }
-            {!equippedItems.length && !err && <p style={{fontStyle:"italic"}}>Fetching your equipment...</p>}
-            {err && <p>No items found</p>}
+            {!equippedItems.length && !err && <p style={{fontStyle:"italic", textAlign:"center"}}>Fetching your equipment...</p>}
+            {err && <p style={{textAlign:"center"}}>No items found</p>}
         </>
         
     )
@@ -174,7 +177,8 @@ export const EquipmentLayout = ({items, slots} : EquipmentProp) =>{
 
     const [layout, setLayout] = useState<any>();
     const [equippedSlots, setEquippedSlots] = useState<{slot: string, item: any}[]>([]);
-
+    const [leftPos, setLeftPos] = useState(0);
+    const [topPos, setTopPos] = useState(0);
     const initialIcons = {
         Helm:           {image: <img src={placeholder}></img>, description:""},
         Shoulders:      {image: <img src={placeholder}></img>, description:""},
@@ -215,40 +219,56 @@ export const EquipmentLayout = ({items, slots} : EquipmentProp) =>{
         return() =>{
             setIcons(initialIcons)
         }
-    }, [equippedSlots, setEquippedSlots])
+    }, [equippedSlots, setEquippedSlots, leftPos, topPos])
     
 
-    useEffect(() => {
-        const test = document.getElementById("test")?.getBoundingClientRect();
-        console.log(test);
-    },[handleMouseEnter, handleMouseExit])
+    function checkHeight(element: HTMLElement | null): number {
+        //This function decides what part of the screen the absolutely position card should appear
+        //so that it never has any overflow into height or width
+        const height = element?.firstElementChild?.clientHeight;
+        const screenHeight = window.innerHeight;
+        const elementPosBottom = element?.getBoundingClientRect().bottom;
+        const heightReq = screenHeight < (elementPosBottom ? elementPosBottom : 0) + (height? height:0);
+        return heightReq ? -380 : 0;
+    }
+    function checkWidth(element: HTMLElement | null): number {
+        //This function decides what part of the screen the absolutely position card should appear
+        //so that it never has any overflow into height or width
+        const width = element?.firstElementChild?.clientWidth;
+        const screenWidth = window.innerWidth;
+        const elementPosRight = element?.getBoundingClientRect().right;
+        const widthReq = screenWidth < (elementPosRight ? elementPosRight : 0) + (width ? width : 0);
+        return widthReq ? -300 : -15;
+    }
     function handleMouseEnter(item: EquippedSlotType){
         const element = document.getElementById(item.slot);
         element?.classList.remove("inactiveCard");
         element?.classList.add("activeCard");
+        const top = checkHeight(element);
+        const left = checkWidth(element);
+        setTopPos(top);
+        setLeftPos(left);
     }
     function handleMouseExit(item: EquippedSlotType){
         const element = document.getElementById(item.slot);
         element?.classList.add("inactiveCard");
         element?.classList.remove("activeCard");
     }
-
+    
     function handleIcons(equippedSlots: EquippedSlotType[]){
         let nextIcons: any = {...icons};
         
-                equippedSlots.forEach(_slot => {
-                    const borderColor = findItemColor(_slot.item[0].rarity)
-                    nextIcons[_slot.slot] = {image: <img    onMouseEnter={() => handleMouseEnter(_slot)} 
-                                                            onMouseLeave={() => handleMouseExit(_slot)} 
-                                                            style={{border: `${borderColor} 2px solid`}} src={_slot.item[0]?.icon}></img>,
-                                            description: <span id={_slot.slot}  className="inactiveCard"> <EquipmentCard item={_slot.item[0]}/> </span>};
+        equippedSlots.forEach(_slot => {
+            const borderColor = findItemColor(_slot.item[0].rarity)
+            nextIcons[_slot.slot] = {image: <img    onMouseEnter={() => handleMouseEnter(_slot)} 
+                                                    onMouseLeave={() => handleMouseExit(_slot)} 
+                                                    style={{border: `${borderColor} 2px solid`, width: "50px"}} src={_slot.item[0]?.icon}></img>,
+                                    description: <span id={_slot.slot}  className="inactiveCard" style={{position: "relative"}}> <EquipmentCard topPos={topPos} leftPos={leftPos} item={_slot.item[0]}/> </span>};
             })
-        setIcons(nextIcons);
-    }
-
+            setIcons(nextIcons);
+        }
 
     useEffect(()=>{
-
         setLayout(
             <div className={styles.equipment}>
                 <div className={styles.armour}>
@@ -260,10 +280,10 @@ export const EquipmentLayout = ({items, slots} : EquipmentProp) =>{
                     {icons.Boots.image}      {icons.Boots.description} 
                 </div>
                 <div className={styles.weapons}>
-                   <span> {icons.WeaponA1.image} </span>  {icons.WeaponA1.description}
-                   <span> {icons.WeaponA2.image} </span>  {icons.WeaponA2.description}
-                   <span> {icons.WeaponB1.image} </span>  {icons.WeaponB1.description}     
-                   <span> {icons.WeaponB2.image} </span>  {icons.WeaponB2.description}
+                    {icons.WeaponA1.image} {icons.WeaponA1.description}
+                    {icons.WeaponA2.image} {icons.WeaponA2.description}
+                    {icons.WeaponB1.image} {icons.WeaponB1.description}     
+                    {icons.WeaponB2.image} {icons.WeaponB2.description}
                 </div>
                 <div className={styles.trinkets}>
                     {icons.Backpack.image}   {icons.Backpack.description} 
@@ -291,7 +311,7 @@ export const EquipmentLayout = ({items, slots} : EquipmentProp) =>{
     )
 }
     //component for hovering over items
-export function EquipmentCard({item}: {item: ItemType}){
+export function EquipmentCard({item, leftPos, topPos}: {item: ItemType, leftPos: number, topPos:number}){
         const {name, icon, rarity, level, details, description, flags} = item;
         const {type, weight_class, defense, max_power, min_power} = details;
         
@@ -323,7 +343,7 @@ export function EquipmentCard({item}: {item: ItemType}){
                 description = description.slice(0, startPos)
                 //this is to be able to give the flavour text its blue color, while keeping the previous description white, as it should be
                 if (originalText.includes("<br>") && originalText.includes("<c=@flavor")){
-                    return <div className={styles.cardDescription}> {description}  <br/> <span style={{color: "#34b4eb"}}>{restOfDesc}</span> </div>
+                    return <p className={styles.cardDescription}> {description} <br/> <span style={{color: "#34b4eb"}}>{restOfDesc}</span> </p>
                 }
             }
 
@@ -332,35 +352,31 @@ export function EquipmentCard({item}: {item: ItemType}){
                 const endPos = startPos + 11;
                 const restOfDesc = description.slice(endPos, -4)
                 const startOfDesc = description.slice(0, startPos);
-                return <div className={styles.cardDescription}> {startOfDesc} <br/> <span style={{color: "#34b4eb"}}>{restOfDesc}</span> </div>
+                return <p className={styles.cardDescription}> {startOfDesc}  <span style={{color: "#34b4eb"}}>{restOfDesc}</span> </p>
             } else {
-                return <div className={styles.cardDescription} style={{color: "white"}}> {description} </div>
+                return <p className={styles.cardDescription} style={{color: "white"}}> {description} </p>
             }
         }   
         const newDescription = sanitiseDescription(description);
         const weaponStrength = `${details.min_power} - ${details.max_power}`
 
 
-
         return(
-            <div className={styles.equipmentCard} style=
-                {{top: "-37px", left: "1px"}}
-                
-            >
+            <div className={styles.equipmentCard} style={{top: `${topPos}px`, left:`${leftPos}px`, border: `1px ${textColor} solid`}}>
                 <div className={styles.iconAndName}>
                     <div className={styles.cardIcon}><img src={icon} alt="item icon" /></div>
-                    <div className={styles.cardName}><span style={{color: textColor}}>{name}</span></div>
+                    <div className={styles.cardName}><h1 style={{color: textColor}}>{name}</h1></div>
                 </div>
-                {defense !== 0 && defense !== undefined && <div className={styles.cardDefense}>Armour: <span style={{color: "green"}}>{details.defense}</span></div>}
-                {min_power && max_power && <div className={styles.cardStrength}>Weapon strength: <span style={{color: "green"}}>{weaponStrength}</span></div>}
-                <div className={styles.cardRarity}>{rarity}</div>
-                <div className={styles.cardLevel}>Required level: {level}</div>
-                <div className={styles.cardWeigthClass}>{weight_class}</div>
-                <div className={styles.cardType}>{type}</div>
+                {min_power && max_power && <p className={styles.cardStrength}>Weapon Strength: <span style={{color: "green"}}>{weaponStrength}</span></p>}
+                {defense !== 0 && defense !== undefined && <p className={styles.cardDefense}> Defense: <span style={{color: "green"}}> {details.defense}</span></p>}
+                <p className={styles.cardRarity} style={{color: textColor}}>{rarity}</p>
+                <p className={styles.cardLevel}>Required level: {level}</p>
+                {weight_class && <p className={styles.cardWeigthClass}>{weight_class}</p>}
+                <p className={styles.cardType}>{type}</p>
+                {newDescription && newDescription}
                 {itemStatus && itemStatus.map((status: string, i: number) => (
-                        <span key={i}>{status}</span>
+                        <p key={i} className={styles.cardStatus}>{status}</p>
                 ))}
-                {newDescription}
             </div>
         )
     }
