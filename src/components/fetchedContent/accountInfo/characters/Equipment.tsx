@@ -3,8 +3,8 @@ import { KeyArrayContext } from "../../../../App";
 import styles from "./equipment.module.css"
 import placeholder from "./../../../../assets/placeholder.png"
 import { ItemCard, ItemType, findItemColor } from "../../ItemType";
-
-
+import useItemFetch from "../../../../hooks/useItemFetch";
+import { handleMouseEnter, handleMouseExit } from "../../ItemType";
 
 type TabType = {
     name: string,
@@ -50,39 +50,9 @@ const Equipment = ({charName: charName} : {charName: string}) => {
     }, [tabNumber, setTabNumber])
 
     useEffect(() => {
-        fetchItems(itemIds);
+        useItemFetch(itemIds, setequippedItems);
     }, [itemIds, setItemIds])
-
-    function fetchItems(itemIds: number[]){
-        if (itemIds.length) {
-            fetch(`https://api.guildwars2.com/v2/items?ids=${itemIds}`)
-            .then(res =>{
-                if (res.ok) {
-                    return res.json();
-                }
-            }).then(data =>{
-                const duplicateItems = itemIds.filter((item, i) => itemIds.indexOf(item) !== i)
-                if (duplicateItems.length) {
-                    checkDuplicates(data, duplicateItems);
-                } else {
-                    setequippedItems(data);
-                }
-            })
-        }
-    }
-    //DUPLLICATE IDS ARE CAUSING PROBLEMS: multiple objects with the same item ids are not fetched with the fetchItems function
-    //with this function we create duplicates if the same id exists in our array
-    function checkDuplicates(data: ItemType[], duplicateItems: number[]){
-            data.filter((item) => {
-                duplicateItems.forEach(element => {
-                    if(item.id === element){
-                        data.push(item);
-                    }
-                });
-            })
-            setequippedItems(data);
-        }
-        
+    
     function fetchEquipmentTabs(){
         if (tabNumber) {
             fetch(`https://api.guildwars2.com/v2/characters/${charName}/equipmenttabs/${tabNumber}?access_token=${key?.key}&v=latest`)
@@ -135,7 +105,7 @@ type EquipmentProp = {
     items: ItemType[],
     slots: {slot:string, item:number}[]
 }
-type EquippedSlotType = {
+export type EquippedSlotType = {
     slot: string,
     item: ItemType[]
 }
@@ -145,6 +115,7 @@ export const EquipmentLayout = ({items, slots} : EquipmentProp) =>{
     const [equippedSlots, setEquippedSlots] = useState<{slot: string, item: any}[]>([]);
     const [leftPos, setLeftPos] = useState(0);
     const [topPos, setTopPos] = useState(0);
+
     const initialIcons = {
         Helm:           {image: <img src={placeholder}></img>, description:""},
         Shoulders:      {image: <img src={placeholder}></img>, description:""},
@@ -167,7 +138,6 @@ export const EquipmentLayout = ({items, slots} : EquipmentProp) =>{
         WeaponAquaticB: {image: <img src={placeholder}></img>, description:""}
      }
     const [icons, setIcons] = useState<{[key: string]: any}>(initialIcons)
-
      
     useEffect(()=>{
         {items.length && slots.map((slot) => {
@@ -188,48 +158,15 @@ export const EquipmentLayout = ({items, slots} : EquipmentProp) =>{
     }, [equippedSlots, setEquippedSlots, leftPos, topPos])
     
 
-    function checkHeight(element: HTMLElement | null): number {
-        //This function decides what part of the screen the absolutely position card should appear
-        //so that it never has any overflow into height or width
-        const height = element?.firstElementChild?.clientHeight;
-        const screenHeight = window.innerHeight;
-        const elementPosBottom = element?.getBoundingClientRect().bottom;
-        const heightReq = screenHeight < (elementPosBottom ? elementPosBottom : 0) + (height? height:0);
-        return heightReq ? -380 : 0;
-    }
-    function checkWidth(element: HTMLElement | null): number {
-        //This function decides what part of the screen the absolutely position card should appear
-        //so that it never has any overflow into height or width
-        const width = element?.firstElementChild?.clientWidth;
-        const screenWidth = window.innerWidth;
-        const elementPosRight = element?.getBoundingClientRect().right;
-        const widthReq = screenWidth < (elementPosRight ? elementPosRight : 0) + (width ? width : 0);
-        return widthReq ? -300 : -15;
-    }
-    function handleMouseEnter(item: EquippedSlotType){
-        const element = document.getElementById(item.slot);
-        element?.classList.remove("inactiveCard");
-        element?.classList.add("activeCard");
-        const top = checkHeight(element);
-        const left = checkWidth(element);
-        setTopPos(top);
-        setLeftPos(left);
-    }
-    function handleMouseExit(item: EquippedSlotType){
-        const element = document.getElementById(item.slot);
-        element?.classList.add("inactiveCard");
-        element?.classList.remove("activeCard");
-    }
-    
     function handleIcons(equippedSlots: EquippedSlotType[]){
         let nextIcons: any = {...icons};
         
-        equippedSlots.forEach(_slot => {
+        equippedSlots.forEach((_slot, i) => {
             const borderColor = findItemColor(_slot.item[0].rarity)
-            nextIcons[_slot.slot] = {image: <img    onMouseEnter={() => handleMouseEnter(_slot)} 
-                                                    onMouseLeave={() => handleMouseExit(_slot)} 
+            nextIcons[_slot.slot] = {image: <img    onMouseEnter={() => handleMouseEnter(i, setTopPos, setLeftPos)} 
+                                                    onMouseLeave={() => handleMouseExit(i)} 
                                                     style={{border: `${borderColor} 2px solid`, width: "50px"}} src={_slot.item[0]?.icon}></img>,
-                                    description: <span id={_slot.slot}  className="inactiveCard" style={{position: "relative"}}> <ItemCard topPos={topPos} leftPos={leftPos} item={_slot.item[0]} styles={styles}/> </span>};
+                                    description: <span id={String(i)}  className="inactiveCard" style={{position: "relative"}}> <ItemCard topPos={topPos} leftPos={leftPos} item={_slot.item[0]} styles={styles}/> </span>};
             })
             setIcons(nextIcons);
         }

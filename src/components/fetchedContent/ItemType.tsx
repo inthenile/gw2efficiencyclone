@@ -1,5 +1,5 @@
 export type ItemType = {
-    default_skin: number,
+    default_skin?: number,
     description: string,
     details: 
         {
@@ -10,10 +10,10 @@ export type ItemType = {
             defense?: number
         },
     icon: string,
-    name: string,
+    name?: string,
     rarity: string,
     id: number,
-    slot: string,
+    slot?: string,
     level?: number
     flags?: string[]
 }
@@ -41,10 +41,8 @@ export function findItemColor(rarity: string){
 export function ItemCard({item, leftPos, topPos, styles}: {item: ItemType, leftPos: number, topPos:number, styles: CSSModuleClasses }){
         const {name, icon, rarity, level, details, description, flags} = item;
         const {type, weight_class, defense, max_power, min_power} = details;
-        
         const textColor = findItemColor(rarity)
         const itemStatus: string[] = []
-        
         flags?.map(flag => {
             switch (flag) {
                 case "AccountBound":
@@ -87,9 +85,8 @@ export function ItemCard({item, leftPos, topPos, styles}: {item: ItemType, leftP
         const newDescription = sanitiseDescription(description);
         const weaponStrength = `${details.min_power} - ${details.max_power}`
 
-
         return(
-            <div className={styles.equipmentCard} style={{top: `${topPos}px`, left:`${leftPos}px`, border: `1px ${textColor} solid`}}>
+            <div className={styles.itemCard} style={{top: `${topPos}px`, left:`${leftPos}px`, border: `1px ${textColor} solid`}}>
                 <div className={styles.iconAndName}>
                     <div className={styles.cardIcon}><img src={icon} alt="item icon" /></div>
                     <div className={styles.cardName}><h1 style={{color: textColor}}>{name}</h1></div>
@@ -97,14 +94,47 @@ export function ItemCard({item, leftPos, topPos, styles}: {item: ItemType, leftP
                 {min_power && max_power && <p className={styles.cardStrength}>Weapon Strength: <span style={{color: "green"}}>{weaponStrength}</span></p>}
                 {defense !== 0 && defense !== undefined && <p className={styles.cardDefense}> Defense: <span style={{color: "green"}}> {details.defense}</span></p>}
                 <p className={styles.cardRarity} style={{color: textColor}}>{rarity}</p>
-                <p className={styles.cardLevel}>Required level: {level}</p>
+                {level !== 0 && <p className={styles.cardLevel}>Required level: {level}</p>}
                 {weight_class && <p className={styles.cardWeigthClass}>{weight_class}</p>}
-                <p className={styles.cardType}>{type}</p>
+                {type && <p className={styles.cardType}>{type}</p>}
                 {newDescription && newDescription}
                 {itemStatus && itemStatus.map((status: string, i: number) => (
                         <p key={i} className={styles.cardStatus}>{status}</p>
                 ))}
             </div>
         )
+    }
+    
+function checkHeight(element: HTMLElement | null): number {
+        //This function decides what part of the screen the absolutely position card should appear
+        //so that it never has any overflow into height or width
+        const height = element?.firstElementChild?.clientHeight;
+        const screenHeight = window.innerHeight;
+        const elementPosBottom = element?.getBoundingClientRect().bottom;
+        const heightReq = screenHeight < (elementPosBottom ? elementPosBottom : 0) + (height? height:0);
+        return heightReq ? -380 : 0;
+    }
+function checkWidth(element: HTMLElement | null): number {
+        //This function decides what part of the screen the absolutely position card should appear
+        //so that it never has any overflow into height or width
+        const width = element?.firstElementChild?.clientWidth;
+        const screenWidth = window.innerWidth;
+        const elementPosRight = element?.getBoundingClientRect().right;
+        const widthReq = screenWidth < (elementPosRight ? elementPosRight : 0) + (width ? width : 0);
+        return widthReq ? -300 : -15;
+    }
+export function handleMouseEnter(index: number, setTopPos: React.Dispatch<React.SetStateAction<number>>, setLeftPos: React.Dispatch<React.SetStateAction<number>>){
+        const element = document.getElementById(String(index));
+        element?.classList.remove("inactiveCard");
+        element?.classList.add("activeCard");
+        const top = checkHeight(element);
+        const left = checkWidth(element);
+        setTopPos(top);
+        setLeftPos(left);
+    }
+export function handleMouseExit(index: number){
+        const element = document.getElementById(String(index));
+        element?.classList.add("inactiveCard");
+        element?.classList.remove("activeCard");
     }
     

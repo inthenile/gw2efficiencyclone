@@ -1,4 +1,4 @@
-.equipmentCard p, .equipmentCard p span{
+.itemCard p, .itemCard p span{
     text-align: left;
     padding: 0;
     font-size: 0.9em;
@@ -25,7 +25,7 @@ div.cardIcon > img{
     margin: 0;
     padding: 0;
 }
-.equipmentCard{
+.itemCard{
     padding: 5px;
     width: 250px;
     max-width: 250px;

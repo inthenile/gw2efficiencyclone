@@ -1,0 +1,60 @@
+.sharedInvIconContainer{
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+.sharedInvIconContainer img{
+    margin-left: 5px;
+    width: 50px;
+}
+
+
+.itemCard p, .itemCard p span{
+    text-align: left;
+    padding: 0;
+    font-size: 0.9em;
+} 
+.cardName{
+    font-weight: bold;  
+    margin-left: 10px;
+}
+
+.iconAndName{
+    display: flex;
+    align-items: center;
+    font-size: 10px;
+}
+div.cardIcon > img{
+    width: 35px;
+    border: 1px solid white;
+}
+.cardRarity, .cardLevel, .cardWeigthClass, .cardType, .cardStatus{
+    margin: 0;
+    padding: 0;
+}
+.itemCard{
+    padding: 5px;
+    width: 250px;
+    max-width: 250px;
+    min-height: 350px;
+    display: flex;
+    justify-content: space-around;
+    flex-direction: column;
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.932);
+    color: white;
+}
+.equipment{
+    margin-top: 25px;
+    text-align: center;
+}
+.cardStrength p, .cardDefense p{
+    margin: 20px 0;
+}
+
+@media screen and (min-width: 1200px){
+    .equipment > div img{
+        width: 50px;
+        }
+
+}

@@ -1,5 +1,6 @@
 .expansions{
     display: flex;
+    align-items: center;
 }
 .expansions img{
     width: 35px;
