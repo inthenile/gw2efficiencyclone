@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { ItemType, ItemCard, findItemColor, handleMouseEnter, handleMouseExit } from "../ItemType";
 import placeholder from "../../../assets/placeholder.png"
 import styles from "./sharedInventoryInfo.module.css"
+import itemCardStyles from "./../itemcard.module.css"
 import useItemFetch from "../../../hooks/useItemFetch";
 
 const SharedInventoryInfo = ({data:data} :  any) => {
@@ -46,12 +47,9 @@ const SharedInventoryInfo = ({data:data} :  any) => {
     function checkEmptySpots(){
         //save the index numbers of empty slots.
         //if no empty spots, temporary items must be the full list
-        console.log(itemIds);
-        
         const emptySlots: number[] = []
         itemIds.map((id, i) => {
             if (id === 0) {
-                console.log(i);
                 emptySlots.push((i));
             }
         })
@@ -76,7 +74,7 @@ const SharedInventoryInfo = ({data:data} :  any) => {
         const x = {image: <img onMouseEnter={() => handleMouseEnter(i, setTopPos, setLeftPos)} 
                             onMouseLeave={() => handleMouseExit(i)} 
                             style={{border: `${borderColor} 2px solid`, width: "50px"}} src={item.icon}></img>, 
-                    description: <span id={String(i)}  className="inactiveCard" style={{position: "relative"}}> <ItemCard topPos={topPos} leftPos={leftPos} item={item} styles={styles}/> </span>}
+                    description: <span id={String(i)}  className="inactiveCard" style={{position: "relative"}}> <ItemCard topPos={topPos} leftPos={leftPos} item={item} styles={itemCardStyles}/> </span>}
         nextIcons.push(x);
         })
         setDescriptions(nextIcons)

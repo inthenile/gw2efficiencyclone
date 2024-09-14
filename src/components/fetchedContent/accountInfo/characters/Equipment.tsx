@@ -1,6 +1,7 @@
 import React, {useContext, useEffect, useState } from "react";
 import { KeyArrayContext } from "../../../../App";
 import styles from "./equipment.module.css"
+import itemCardStyles from "./../../itemcard.module.css"
 import placeholder from "./../../../../assets/placeholder.png"
 import { ItemCard, ItemType, findItemColor } from "../../ItemType";
 import useItemFetch from "../../../../hooks/useItemFetch";
@@ -166,7 +167,7 @@ export const EquipmentLayout = ({items, slots} : EquipmentProp) =>{
             nextIcons[_slot.slot] = {image: <img    onMouseEnter={() => handleMouseEnter(i, setTopPos, setLeftPos)} 
                                                     onMouseLeave={() => handleMouseExit(i)} 
                                                     style={{border: `${borderColor} 2px solid`, width: "50px"}} src={_slot.item[0]?.icon}></img>,
-                                    description: <span id={String(i)}  className="inactiveCard" style={{position: "relative"}}> <ItemCard topPos={topPos} leftPos={leftPos} item={_slot.item[0]} styles={styles}/> </span>};
+                                    description: <span id={String(i)}  className="inactiveCard" style={{position: "relative"}}> <ItemCard topPos={topPos} leftPos={leftPos} item={_slot.item[0]} styles={itemCardStyles}/> </span>};
             })
             setIcons(nextIcons);
         }
