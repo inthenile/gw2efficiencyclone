@@ -20,6 +20,7 @@ export type ItemType = {
     level?: number
     flags?: string[]
 }
+import styles from "./itemcard.module.css"
 
 export function findItemColor(rarity: string){
     switch(rarity){
@@ -41,8 +42,8 @@ export function findItemColor(rarity: string){
 }
 
     //component for hovering over items
-export function ItemCard({item, leftPos, topPos, styles}: {item: ItemType, leftPos: number, topPos:number, styles: CSSModuleClasses }){
-        let {name, icon, rarity, level, details, description, flags} = item;
+export function ItemCard({item, leftPos, topPos}: {item: ItemType, leftPos: number, topPos:number}){
+        let {name, icon, rarity, level, details, description, flags, count} = item;
         const {type, weight_class, defense, max_power, min_power} = details ?? {};
         //sometimes details have the description in certain items, instead of the item itself.
         description === undefined ? {description} = details : description
@@ -99,11 +100,12 @@ export function ItemCard({item, leftPos, topPos, styles}: {item: ItemType, leftP
         const newDescription = sanitiseDescription(description ? description : undefined);
         const weaponStrength = `${details?.min_power} - ${details?.max_power}`
 
+
         return(
             <div className={styles.itemCard} style={{top: `${topPos}px`, left:`${leftPos}px`, border: `1px ${textColor} solid`}}>
                 <div className={styles.iconAndName}>
                     <div className={styles.cardIcon}><img src={icon} alt="item icon" /></div>
-                    <div className={styles.cardName}><h1 style={{color: textColor}}>{name}</h1></div>
+                    <div className={styles.cardName}><h1 style={{color: textColor}}>{  count && count > 1 && count} {name}</h1></div>
                 </div>
                 {min_power && max_power && <p className={styles.cardStrength}>Weapon Strength: <span style={{color: "green"}}>{weaponStrength}</span></p>}
                 {defense !== 0 && defense !== undefined && <p className={styles.cardDefense}> Defense: <span style={{color: "green"}}> {details?.defense}</span></p>}
@@ -126,7 +128,7 @@ function checkHeight(element: HTMLElement | null): number {
         const screenHeight = window.innerHeight;
         const elementPosBottom = element?.getBoundingClientRect().bottom;
         const heightReq = screenHeight < (elementPosBottom ? elementPosBottom : 0) + (height? height:0);
-        return heightReq ? -380 : 0;
+        return heightReq ? -440 : -15;
     }
 function checkWidth(element: HTMLElement | null): number {
         //This function decides what part of the screen the absolutely position card should appear
@@ -135,7 +137,7 @@ function checkWidth(element: HTMLElement | null): number {
         const screenWidth = window.innerWidth;
         const elementPosRight = element?.getBoundingClientRect().right;
         const widthReq = screenWidth < (elementPosRight ? elementPosRight : 0) + (width ? width : 0);
-        return widthReq ? -300 : -15;
+        return widthReq ? -250 : 50;
     }
 export function handleMouseEnter(index: number, setTopPos: React.Dispatch<React.SetStateAction<number>>, setLeftPos: React.Dispatch<React.SetStateAction<number>>){
         const element = document.getElementById(String(index));

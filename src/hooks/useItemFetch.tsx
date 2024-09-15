@@ -1,7 +1,12 @@
-import { ItemType } from "../components/fetchedContent/ItemType";
+import { ItemType } from "../components/fetchedContent/ItemCard";
 import placeholder from "./../assets/placeholder.png"
 
-export default function useItemFetch(itemIds: {id: number; i: number}[],
+export type itemIdType = {
+    id: number;
+    i: number;
+    count?: number
+}
+export default function useItemFetch(itemIds: itemIdType[],
                                     setItems: React.Dispatch<React.SetStateAction<ItemType[]>>,
                                     setUsedSpace: React.Dispatch<React.SetStateAction<number>> ){
 
@@ -23,7 +28,7 @@ export default function useItemFetch(itemIds: {id: number; i: number}[],
                 itemIds.map(_item => {
                 data.map((item: ItemType) => {
                         if (_item.id === item.id) {
-                            allItems.splice(_item.i, 0, item)
+                            allItems.splice(_item.i, 0, {...item, count: _item.count})
                         }
                     })  
                     if (_item.id === 0) {

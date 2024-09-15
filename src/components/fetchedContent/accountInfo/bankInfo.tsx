@@ -1,17 +1,16 @@
 import { useEffect, useState } from "react";
-import itemCardStyles from "./../itemcard.module.css"
 import styles from "./bankInfo.module.css"
-import { findItemColor, handleMouseEnter, handleMouseExit, ItemCard, ItemType } from "../ItemType";
-import useItemFetch from "../../../hooks/useItemFetch";
+import { findItemColor, handleMouseEnter, handleMouseExit, ItemCard, ItemType } from "../ItemCard";
+import useItemFetch, { itemIdType } from "../../../hooks/useItemFetch";
 
 const BankInfo = ({data} : {data: any}) => {
     
 
-    const [tabAmount, setTabAmount] = useState(0)
-    const [itemIds, setItemIds] = useState<{id: number; i: number}[]>([])
+    const [tabAmount, setTabAmount] = useState<number[]>([])
+    const [itemIds, setItemIds] = useState<itemIdType[]>([])
     const [items, setItems] = useState<ItemType[]>([])
     const [usedSpace, setUsedSpace] = useState(0)
-    const [descriptions, setDescriptions] = useState<{[key: string]: any}>()
+    const [icons, setIcons] = useState<{[key: string]: any}>()
     const [leftPos, setLeftPos] = useState(0);
     const [topPos, setTopPos] = useState(0);
     
@@ -20,12 +19,16 @@ const BankInfo = ({data} : {data: any}) => {
         const slotAmount = 30; //this is the number of item slots that are available in a single bank tab.
         //therefore the amount of tab amount is data.length divided by 30.
         const totalTabs = data.length / slotAmount;
-        setTabAmount(totalTabs)
+        const x = []
+        for (let i = 0; i < totalTabs; i++) {
+            x.push(i)
+        }
+        setTabAmount([...x])
         //when page renders, get the item id's.
         data.map((d: any, index: number) =>{
             if (d) {
-                const {id} = d;
-                setItemIds(i => [...i, {id: id, i: index}]);
+                const {id, count} = d;
+                setItemIds(i => [...i, {id: id, i: index, count: count}]);
             } else {
                 setItemIds(i => [...i, {id: 0, i: index}]); //I am using 0 as a placeholder for null values. I am going to place an empty icon there
             }
@@ -44,8 +47,19 @@ const BankInfo = ({data} : {data: any}) => {
     }, [items, leftPos, topPos])
 
     useEffect(() => {
-        
+        // let flag = tabAmount.length;
+        // let amountToIncrease = 30;
+
+        // while (flag > 0) {
+        //     for (let i = 0; i < amountToIncrease; i++) {
+        //         console.log(1);
+                
+        //     }
+        //     amountToIncrease += amountToIncrease;
+        // }
+
     }, [tabAmount])
+
 
 
     function handleIcons (){
@@ -55,13 +69,15 @@ const BankInfo = ({data} : {data: any}) => {
         const x = {image: <img onMouseEnter={() => handleMouseEnter(i, setTopPos, setLeftPos)} 
                             onMouseLeave={() => handleMouseExit(i)} 
                             style={{border: `${borderColor} 2px solid`, width: "50px"}} src={item.icon}></img>, 
-                    description: <span id={String(i)}  className="inactiveCard" style={{position: "relative"}}> <ItemCard topPos={topPos} leftPos={leftPos} item={item} styles={itemCardStyles}/> </span>}
+                    count: <div className={styles.itemCount}>{item.count}</div>,
+                    description: <span id={String(i)}  className="inactiveCard" style={{position: "relative"}}> <ItemCard topPos={topPos} leftPos={leftPos} item={item} /> </span>}
         nextIcons.push(x);
         })
-        setDescriptions(nextIcons)
+        setIcons(nextIcons)
     } 
     
     useEffect(() =>{
+        console.log(icons && icons.length);
         
     }, [tabAmount])
     
@@ -69,9 +85,10 @@ const BankInfo = ({data} : {data: any}) => {
         <>
         {items.length !== 0 && <p style={{textAlign:"center"}}>You are using <b>{usedSpace}/{items.length}</b> of your bank.</p>}
         <div className={styles.bankIconContainer}>
-        {descriptions && descriptions.map((x: any, i:number)=> (
-                <div key={i}> {x.image} {x.description} </div>
-            ))}
+        
+        {icons && icons.map((x: any, i:number)=> (
+            <div key={i}> <div className={styles.itemCountContainer}>{x.image} {x.count} </div>{x.description} </div>
+        ))}
         </div>
     </>
      );

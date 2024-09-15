@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
-import { ItemType, ItemCard, findItemColor, handleMouseEnter, handleMouseExit } from "../ItemType";
-import placeholder from "../../../assets/placeholder.png"
+import { ItemType, ItemCard, findItemColor, handleMouseEnter, handleMouseExit } from "../ItemCard";
 import styles from "./sharedInventoryInfo.module.css"
-import itemCardStyles from "./../itemcard.module.css"
-import useItemFetch from "../../../hooks/useItemFetch";
+import useItemFetch, { itemIdType } from "../../../hooks/useItemFetch";
 
 const SharedInventoryInfo = ({data:data} :  any) => {
-    const [itemIds, setItemIds] = useState<{id: number; i: number}[]>([])
+    const [itemIds, setItemIds] = useState<itemIdType[]>([])
     const [items, setItems] = useState<ItemType[]>([])
     const [usedSpace, setUsedSpace] = useState(0)
     const [descriptions, setDescriptions] = useState<{[key: string]: any}>()
@@ -22,7 +20,7 @@ const SharedInventoryInfo = ({data:data} :  any) => {
             if (d) {
                 const {id, binding, count} = d;
                 console.log(binding, count);
-                setItemIds(i => [...i, {id: id, i: index}]);
+                setItemIds(i => [...i, {id: id, i: index, count: count}]);
             } else {
                 setItemIds(i => [...i, {id: 0, i: index}]); //I am using 0 as a placeholder for null values. I am going to place an empty icon there
             }
@@ -48,7 +46,8 @@ const SharedInventoryInfo = ({data:data} :  any) => {
         const x = {image: <img onMouseEnter={() => handleMouseEnter(i, setTopPos, setLeftPos)} 
                             onMouseLeave={() => handleMouseExit(i)} 
                             style={{border: `${borderColor} 2px solid`, width: "50px"}} src={item.icon}></img>, 
-                    description: <span id={String(i)}  className="inactiveCard" style={{position: "relative"}}> <ItemCard topPos={topPos} leftPos={leftPos} item={item} styles={itemCardStyles}/> </span>}
+                    count: <div className={styles.itemCount}>{item.count}</div>,
+                    description: <span id={String(i)}  className="inactiveCard" style={{position: "relative"}}> <ItemCard topPos={topPos} leftPos={leftPos} item={item}/> </span>}
         nextIcons.push(x);
         })
         setDescriptions(nextIcons)
@@ -59,7 +58,7 @@ const SharedInventoryInfo = ({data:data} :  any) => {
             {items.length !== 0 && <p style={{textAlign:"center"}}>Found <b>{usedSpace} / {items.length}</b> items in your shared inventory.</p>}
             <div className={styles.sharedInvIconContainer}>
                 {descriptions && descriptions.map((x: any, i:number)=> (
-                    <div key={i}> {x.image} {x.description} </div>
+                    <div key={i}> <div className={styles.itemCountContainer}>{x.image} {x.count} </div>{x.description} </div>
                 ))}
             </div>
         </>

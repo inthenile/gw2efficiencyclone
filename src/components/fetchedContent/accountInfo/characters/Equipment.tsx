@@ -3,9 +3,9 @@ import { KeyArrayContext } from "../../../../App";
 import styles from "./equipment.module.css"
 import itemCardStyles from "./../../itemcard.module.css"
 import placeholder from "./../../../../assets/placeholder.png"
-import { ItemCard, ItemType, findItemColor } from "../../ItemType";
+import { ItemCard, ItemType, findItemColor } from "../../ItemCard";
 import useItemFetch from "../../../../hooks/useItemFetch";
-import { handleMouseEnter, handleMouseExit } from "../../ItemType";
+import { handleMouseEnter, handleMouseExit } from "../../ItemCard";
 
 type TabType = {
     name: string,
