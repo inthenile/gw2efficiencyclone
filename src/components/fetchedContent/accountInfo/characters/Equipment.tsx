@@ -18,7 +18,6 @@ const Equipment = ({charName: charName} : {charName: string}) => {
 
     const keyContext = useContext(KeyArrayContext)
     const key = keyContext?.isMainKey;
-
     const [tabs, setTabs] = useState<TabType[]>([]);
     const [tabNumber, setTabNumber] = useState<string>();
     const [equippedItems, setequippedItems] = useState<ItemType[]>([]);

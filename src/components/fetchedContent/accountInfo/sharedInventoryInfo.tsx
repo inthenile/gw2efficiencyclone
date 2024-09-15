@@ -6,9 +6,9 @@ import itemCardStyles from "./../itemcard.module.css"
 import useItemFetch from "../../../hooks/useItemFetch";
 
 const SharedInventoryInfo = ({data:data} :  any) => {
-    const [itemIds, setItemIds] = useState<number[]>([])
-    const [tempItems, setTempItems] = useState<ItemType[]>([])
+    const [itemIds, setItemIds] = useState<{id: number; i: number}[]>([])
     const [items, setItems] = useState<ItemType[]>([])
+    const [usedSpace, setUsedSpace] = useState(0)
     const [descriptions, setDescriptions] = useState<{[key: string]: any}>()
     const [leftPos, setLeftPos] = useState(0);
     const [topPos, setTopPos] = useState(0);
@@ -18,12 +18,13 @@ const SharedInventoryInfo = ({data:data} :  any) => {
     //As that shared inventory slot occupied by the boost cannot be used for any other item until the boost is consumed anyway.
     useEffect(() =>{
         //when page renders, get the item id's.
-        data.map((d: any) =>{
+        data.map((d: any, index: number) =>{
             if (d) {
-                const {id} = d;
-                setItemIds(i => [...i, id]);
+                const {id, binding, count} = d;
+                console.log(binding, count);
+                setItemIds(i => [...i, {id: id, i: index}]);
             } else {
-                setItemIds(i => [...i, 0]); //I am using 0 as a placeholder for null values. I am going to place an empty icon there
+                setItemIds(i => [...i, {id: 0, i: index}]); //I am using 0 as a placeholder for null values. I am going to place an empty icon there
             }
         })
         return() =>{
@@ -32,40 +33,13 @@ const SharedInventoryInfo = ({data:data} :  any) => {
     },[])
     //once the item ids are saved, we can fetch the item data.
     useEffect(() =>{
-        useItemFetch(itemIds, setTempItems);
+        useItemFetch(itemIds, setItems, setUsedSpace);
     }, [itemIds, setItemIds])
-    //after the items are fetched they are first saved in a temporary array
-    //so that I can populate a new array with Empty slots as well
-    useEffect(() => {
-        checkEmptySpots();
-    }, [tempItems])
 
     useEffect(()=>{
         handleIcons();
     }, [items, leftPos, topPos])
 
-    function checkEmptySpots(){
-        //save the index numbers of empty slots.
-        //if no empty spots, temporary items must be the full list
-        const emptySlots: number[] = []
-        itemIds.map((id, i) => {
-            if (id === 0) {
-                emptySlots.push((i));
-            }
-        })
-        if (emptySlots.length) {
-            const emptyItem: ItemType = {icon: placeholder, level: 0, description: "This slot appears to be empty", rarity: "", id:0, details: {}}
-            const oldList = [...tempItems]
-            emptySlots.forEach(slot =>{
-                console.log(slot);
-                
-                oldList.splice(slot, 0, emptyItem)                
-            })
-            setItems(oldList);
-        } else {
-            setItems(tempItems)
-        }
-    }
 
     function handleIcons (){
         const nextIcons: any[] = []
@@ -82,7 +56,7 @@ const SharedInventoryInfo = ({data:data} :  any) => {
 
     return ( 
         <>
-            {items.length !== 0 && <p style={{textAlign:"center"}}>Found <b>{items.length}</b> items in your shared inventory.</p>}
+            {items.length !== 0 && <p style={{textAlign:"center"}}>Found <b>{usedSpace} / {items.length}</b> items in your shared inventory.</p>}
             <div className={styles.sharedInvIconContainer}>
                 {descriptions && descriptions.map((x: any, i:number)=> (
                     <div key={i}> {x.image} {x.description} </div>

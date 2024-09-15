@@ -1,8 +1,11 @@
 export type ItemType = {
+    count?: number;
+    binding?: string;
     default_skin?: number,
-    description: string,
+    description?: string,
     details: 
         {
+            description? :string,
             type?: string,
             weight_class?: string,
             max_power?: number,
@@ -39,8 +42,10 @@ export function findItemColor(rarity: string){
 
     //component for hovering over items
 export function ItemCard({item, leftPos, topPos, styles}: {item: ItemType, leftPos: number, topPos:number, styles: CSSModuleClasses }){
-        const {name, icon, rarity, level, details, description, flags} = item;
-        const {type, weight_class, defense, max_power, min_power} = details;
+        let {name, icon, rarity, level, details, description, flags} = item;
+        const {type, weight_class, defense, max_power, min_power} = details ?? {};
+        //sometimes details have the description in certain items, instead of the item itself.
+        description === undefined ? {description} = details : description
         const textColor = findItemColor(rarity)
         const itemStatus: string[] = []
         flags?.map(flag => {
@@ -57,10 +62,20 @@ export function ItemCard({item, leftPos, topPos, styles}: {item: ItemType, leftP
             }
         })
         
-        function sanitiseDescription(description: string){
-            //This function removes the <c=@flavour> </c> from the text
-            //this is a custom text color from ArenaNet. Slicing it out and giving it the colour it actually receives from this markup
+        function sanitiseDescription(description: string | undefined){
+            //This function removes custom tags like <c=@flavour> </c> and <c=@warning></c> from the text
+            //these are custom text colors in ArenaNet's engine. Slicing it out and giving it the colour it actually receives from this markup
+            if (description === undefined) {
+                return null;
+            }
             const originalText = description;
+            if (description?.includes("<c=@warning>") || description?.includes("<c=@Warning>")) {
+                const startPos = description.indexOf("<")
+                const endPos = startPos + 12;
+                const restOfDesc = description.slice(endPos, -4)
+                const startOfDesc = description.slice(0, startPos);
+                return <p className={styles.cardDescription}> {startOfDesc}  <span style={{color: "red"}}>{restOfDesc}</span> </p>
+            }
             if (description?.includes("<br>")) {
                 const startPos = description.indexOf("<")
                 const endPos = startPos + 4;
@@ -71,8 +86,7 @@ export function ItemCard({item, leftPos, topPos, styles}: {item: ItemType, leftP
                     return <p className={styles.cardDescription}> {description} <br/> <span style={{color: "#34b4eb"}}>{restOfDesc}</span> </p>
                 }
             }
-
-            if(description?.includes("<c=@flavor>") && !description.includes("<br>")){
+            if(description?.includes("<c=@flavor>") || description?.includes("<c=@Flavor>") && !description.includes("<br>")){
                 const startPos = description.indexOf("<")
                 const endPos = startPos + 11;
                 const restOfDesc = description.slice(endPos, -4)
@@ -82,8 +96,8 @@ export function ItemCard({item, leftPos, topPos, styles}: {item: ItemType, leftP
                 return <p className={styles.cardDescription} style={{color: "white"}}> {description} </p>
             }
         }   
-        const newDescription = sanitiseDescription(description);
-        const weaponStrength = `${details.min_power} - ${details.max_power}`
+        const newDescription = sanitiseDescription(description ? description : undefined);
+        const weaponStrength = `${details?.min_power} - ${details?.max_power}`
 
         return(
             <div className={styles.itemCard} style={{top: `${topPos}px`, left:`${leftPos}px`, border: `1px ${textColor} solid`}}>
@@ -92,7 +106,7 @@ export function ItemCard({item, leftPos, topPos, styles}: {item: ItemType, leftP
                     <div className={styles.cardName}><h1 style={{color: textColor}}>{name}</h1></div>
                 </div>
                 {min_power && max_power && <p className={styles.cardStrength}>Weapon Strength: <span style={{color: "green"}}>{weaponStrength}</span></p>}
-                {defense !== 0 && defense !== undefined && <p className={styles.cardDefense}> Defense: <span style={{color: "green"}}> {details.defense}</span></p>}
+                {defense !== 0 && defense !== undefined && <p className={styles.cardDefense}> Defense: <span style={{color: "green"}}> {details?.defense}</span></p>}
                 <p className={styles.cardRarity} style={{color: textColor}}>{rarity}</p>
                 {level !== 0 && <p className={styles.cardLevel}>Required level: {level}</p>}
                 {weight_class && <p className={styles.cardWeigthClass}>{weight_class}</p>}

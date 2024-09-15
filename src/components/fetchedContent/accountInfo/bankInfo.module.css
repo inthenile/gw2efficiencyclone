@@ -1,0 +1,10 @@
+.bankIconContainer{
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+.bankIconContainer img{
+    margin-left: 5px;
+    width: 50px;
+}
+
