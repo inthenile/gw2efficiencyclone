@@ -7,17 +7,16 @@
     margin-left: 5px;
     width: 50px;
 }
-
 .itemCountContainer{
     position: relative;
-
 }
 .itemCount{
     position: absolute;
-    top: 50%;
+    bottom: 20%;
     color: white;
     font-weight: bold;
-    left: 25%;
+    left: 10%;
+    font-size: 19px;
+    text-shadow: 1px 1px black;
     pointer-events: none;
-
 }

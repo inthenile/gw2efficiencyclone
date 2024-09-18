@@ -6,10 +6,12 @@ export type itemIdType = {
     i: number;
     count?: number
 }
-export default function useItemFetch(itemIds: itemIdType[],
-                                    setItems: React.Dispatch<React.SetStateAction<ItemType[]>>,
-                                    setUsedSpace: React.Dispatch<React.SetStateAction<number>> ){
-
+type Props = {
+    itemIds: itemIdType[],
+    setItems: React.Dispatch<React.SetStateAction<any[]>>,
+    setUsedSpace?: React.Dispatch<React.SetStateAction<number>> 
+}
+export default function useItemFetch({itemIds, setItems, setUsedSpace} : Props ){
 
         if (itemIds.length > 0) {
             const allItems: ItemType[] = []
@@ -20,7 +22,6 @@ export default function useItemFetch(itemIds: itemIdType[],
                 }
             }).then(data =>{
                 const emptyItem: ItemType = {icon: placeholder, level: 0, description: "This slot appears to be empty", rarity: "", id:0, details: { description: ""}}
-                setUsedSpace(data.length); //used inventory/bank space
                 //DUPLLICATE IDS ARE CAUSING PROBLEMS: multiple objects with the same item ids are not fetched with the fetchItems function
                 //here I deal with duplicate items (as well as empty slots, which are essentially multiple items themselves)
                 //get the items that are in the data, place them on their index on itemIds.
@@ -35,6 +36,9 @@ export default function useItemFetch(itemIds: itemIdType[],
                         allItems.splice(_item.i, 0, emptyItem)
                     }
                 })
+                if (setUsedSpace) {
+                    setUsedSpace(allItems.filter(item => item.id !== 0).length); //used inventory/bank space
+                }
                 setItems(allItems);
             })
         }

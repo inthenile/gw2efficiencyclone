@@ -18,8 +18,7 @@ const SharedInventoryInfo = ({data:data} :  any) => {
         //when page renders, get the item id's.
         data.map((d: any, index: number) =>{
             if (d) {
-                const {id, binding, count} = d;
-                console.log(binding, count);
+                const {id, count} = d;
                 setItemIds(i => [...i, {id: id, i: index, count: count}]);
             } else {
                 setItemIds(i => [...i, {id: 0, i: index}]); //I am using 0 as a placeholder for null values. I am going to place an empty icon there
@@ -30,8 +29,11 @@ const SharedInventoryInfo = ({data:data} :  any) => {
         }
     },[])
     //once the item ids are saved, we can fetch the item data.
+    const fetchProps = {
+        itemIds, setItems, setUsedSpace
+    }
     useEffect(() =>{
-        useItemFetch(itemIds, setItems, setUsedSpace);
+        useItemFetch(fetchProps);
     }, [itemIds, setItemIds])
 
     useEffect(()=>{
@@ -58,7 +60,7 @@ const SharedInventoryInfo = ({data:data} :  any) => {
             {items.length !== 0 && <p style={{textAlign:"center"}}>Found <b>{usedSpace} / {items.length}</b> items in your shared inventory.</p>}
             <div className={styles.sharedInvIconContainer}>
                 {descriptions && descriptions.map((x: any, i:number)=> (
-                    <div key={i}> <div className={styles.itemCountContainer}>{x.image} {x.count} </div>{x.description} </div>
+                    <span key={i}> <span className={styles.itemCountContainer}>{x.image} {x.count} </span>{x.description} </span>
                 ))}
             </div>
         </>

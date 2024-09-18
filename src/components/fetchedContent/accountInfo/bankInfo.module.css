@@ -1,25 +1,50 @@
-.bankIconContainer{
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-}
-.bankIconContainer img{
+
+.bankTab img{
     margin-left: 5px;
     width: 50px;
 }
 
+.bankTab, .tabName {
+    width: 650px;
+    margin: 15px auto;
+}
+
+.inactiveTab{
+    display: none;
+}
+.tabName{
+    background-color: rgb(68, 68, 67);
+    color: white;
+    text-indent: 30px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+}
+.tabName:hover{
+    cursor: pointer;
+    background-color: rgb(20, 20, 20);
+    color: rgb(255, 251, 216);
+}
+
 .itemCountContainer{
     position: relative;
-
 }
 .itemCount{
     position: absolute;
-    top: 35%;
+    bottom: 20%;
     color: white;
     font-weight: bold;
-    left: 25%;
+    left: 10%;
     font-size: 19px;
     text-shadow: 1px 1px black;
     pointer-events: none;
+}
 
+@media screen and (max-width: 650px) {
+    .bankTab{
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        width: unset;
+    }
 }

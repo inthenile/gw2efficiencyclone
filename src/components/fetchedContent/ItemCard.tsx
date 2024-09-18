@@ -64,12 +64,19 @@ export function ItemCard({item, leftPos, topPos}: {item: ItemType, leftPos: numb
         })
         
         function sanitiseDescription(description: string | undefined){
+
+            //THERE IS ANOTHER TAG <c=@abilitytype> </c> 
+            //sanitise this too
+
             //This function removes custom tags like <c=@flavour> </c> and <c=@warning></c> from the text
             //these are custom text colors in ArenaNet's engine. Slicing it out and giving it the colour it actually receives from this markup
             if (description === undefined) {
                 return null;
             }
-            const originalText = description;
+            
+            description = description.replace("<br>", ""); 
+            //There were too many outliers, too many exceptions, so I just remove the br from the description and then take care of warning and flavour
+
             if (description?.includes("<c=@warning>") || description?.includes("<c=@Warning>")) {
                 const startPos = description.indexOf("<")
                 const endPos = startPos + 12;
@@ -77,17 +84,8 @@ export function ItemCard({item, leftPos, topPos}: {item: ItemType, leftPos: numb
                 const startOfDesc = description.slice(0, startPos);
                 return <p className={styles.cardDescription}> {startOfDesc}  <span style={{color: "red"}}>{restOfDesc}</span> </p>
             }
-            if (description?.includes("<br>")) {
-                const startPos = description.indexOf("<")
-                const endPos = startPos + 4;
-                const restOfDesc = description.slice(endPos+11, -4)
-                description = description.slice(0, startPos)
-                //this is to be able to give the flavour text its blue color, while keeping the previous description white, as it should be
-                if (originalText.includes("<br>") && originalText.includes("<c=@flavor")){
-                    return <p className={styles.cardDescription}> {description} <br/> <span style={{color: "#34b4eb"}}>{restOfDesc}</span> </p>
-                }
-            }
-            if(description?.includes("<c=@flavor>") || description?.includes("<c=@Flavor>") && !description.includes("<br>")){
+
+            if(description?.includes("<c=@flavor>") || description?.includes("<c=@Flavor>")){
                 const startPos = description.indexOf("<")
                 const endPos = startPos + 11;
                 const restOfDesc = description.slice(endPos, -4)
@@ -128,7 +126,7 @@ function checkHeight(element: HTMLElement | null): number {
         const screenHeight = window.innerHeight;
         const elementPosBottom = element?.getBoundingClientRect().bottom;
         const heightReq = screenHeight < (elementPosBottom ? elementPosBottom : 0) + (height? height:0);
-        return heightReq ? -440 : -15;
+        return heightReq ? -440 : 0;
     }
 function checkWidth(element: HTMLElement | null): number {
         //This function decides what part of the screen the absolutely position card should appear
@@ -137,7 +135,7 @@ function checkWidth(element: HTMLElement | null): number {
         const screenWidth = window.innerWidth;
         const elementPosRight = element?.getBoundingClientRect().right;
         const widthReq = screenWidth < (elementPosRight ? elementPosRight : 0) + (width ? width : 0);
-        return widthReq ? -250 : 50;
+        return widthReq ? -310 : -10;
     }
 export function handleMouseEnter(index: number, setTopPos: React.Dispatch<React.SetStateAction<number>>, setLeftPos: React.Dispatch<React.SetStateAction<number>>){
         const element = document.getElementById(String(index));

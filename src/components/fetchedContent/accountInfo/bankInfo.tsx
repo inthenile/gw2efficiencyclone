@@ -13,9 +13,8 @@ const BankInfo = ({data} : {data: any}) => {
     const [icons, setIcons] = useState<{[key: string]: any}>()
     const [leftPos, setLeftPos] = useState(0);
     const [topPos, setTopPos] = useState(0);
-    
+    const [bankTab, setBankTab] = useState<{display: boolean, item: any[]}[]>([]);
     useEffect(() =>{
-
         const slotAmount = 30; //this is the number of item slots that are available in a single bank tab.
         //therefore the amount of tab amount is data.length divided by 30.
         const totalTabs = data.length / slotAmount;
@@ -38,58 +37,69 @@ const BankInfo = ({data} : {data: any}) => {
         }
     },[])
     //once the item ids are saved, we can fetch the item data.
+    const fetchProps = {
+        itemIds, setItems, setUsedSpace
+    }
     useEffect(() =>{
-        useItemFetch(itemIds, setItems, setUsedSpace);
+        useItemFetch(fetchProps);
     }, [itemIds, setItemIds])
 
     useEffect(()=>{
         handleIcons();
     }, [items, leftPos, topPos])
 
-    useEffect(() => {
-        // let flag = tabAmount.length;
-        // let amountToIncrease = 30;
+    useEffect(() =>{ 
+        makeTabs();
+    }, [icons])
 
-        // while (flag > 0) {
-        //     for (let i = 0; i < amountToIncrease; i++) {
-        //         console.log(1);
-                
-        //     }
-        //     amountToIncrease += amountToIncrease;
-        // }
+    function makeTabs(){
+        setBankTab([]);
+        if (icons?.length > 0) {
+            for (let i = 0; i < tabAmount.length; i++) {
+                const x = icons?.splice(0, 30);
+                setBankTab(t => [...t, {item: x, display: true}])
+            }
+        }
+    }
 
-    }, [tabAmount])
-
+    function handleTabDisplay(index: number){
+        setBankTab(bankTab.map((tab, i) => {
+            if (index === i) {
+              return { ...tab, display: !tab.display };
+            } else {
+              return tab;
+            }
+          }));
+    }
 
 
     function handleIcons (){
         const nextIcons: any[] = []
         items && items.map((item, i) => {
         const borderColor = findItemColor(item.rarity);
-        const x = {image: <img onMouseEnter={() => handleMouseEnter(i, setTopPos, setLeftPos)} 
+        const x = { image: <img onMouseEnter={() => handleMouseEnter(i, setTopPos, setLeftPos)} 
                             onMouseLeave={() => handleMouseExit(i)} 
                             style={{border: `${borderColor} 2px solid`, width: "50px"}} src={item.icon}></img>, 
                     count: <div className={styles.itemCount}>{item.count}</div>,
-                    description: <span id={String(i)}  className="inactiveCard" style={{position: "relative"}}> <ItemCard topPos={topPos} leftPos={leftPos} item={item} /> </span>}
+                    description: <span id={String(i)}  className="inactiveCard" style={{position: "relative"}}> <ItemCard topPos={topPos} leftPos={leftPos} item={item} /> </span> }
         nextIcons.push(x);
         })
         setIcons(nextIcons)
     } 
     
-    useEffect(() =>{
-        console.log(icons && icons.length);
-        
-    }, [tabAmount])
-    
     return ( 
         <>
         {items.length !== 0 && <p style={{textAlign:"center"}}>You are using <b>{usedSpace}/{items.length}</b> of your bank.</p>}
-        <div className={styles.bankIconContainer}>
-        
-        {icons && icons.map((x: any, i:number)=> (
-            <div key={i}> <div className={styles.itemCountContainer}>{x.image} {x.count} </div>{x.description} </div>
+        {bankTab && bankTab.map((tab, i) => (
+            <div key={i}>
+                <h1 className={styles.tabName} onClick={() => handleTabDisplay(i)}>Tab: {i+1}</h1>    
+                <div className={styles.bankTab}>
+                {tab && tab.item?.map((x: any, i:number)=> (
+                    <span key={i} className={tab.display ? "" : styles.inactiveTab}> <span className={styles.itemCountContainer}>{x.image} {x.count} </span>{x.description} </span>
+                ))}
+                </div>
+            </div>
         ))}
-        </div>
     </>
      );
 }

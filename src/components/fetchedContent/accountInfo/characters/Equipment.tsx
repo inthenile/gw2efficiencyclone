@@ -1,11 +1,11 @@
 import React, {useContext, useEffect, useState } from "react";
 import { KeyArrayContext } from "../../../../App";
 import styles from "./equipment.module.css"
-import itemCardStyles from "./../../itemcard.module.css"
 import placeholder from "./../../../../assets/placeholder.png"
 import { ItemCard, ItemType, findItemColor } from "../../ItemCard";
 import useItemFetch from "../../../../hooks/useItemFetch";
 import { handleMouseEnter, handleMouseExit } from "../../ItemCard";
+import { itemIdType } from "../../../../hooks/useItemFetch";
 
 type TabType = {
     name: string,
@@ -20,8 +20,8 @@ const Equipment = ({charName: charName} : {charName: string}) => {
     const key = keyContext?.isMainKey;
     const [tabs, setTabs] = useState<TabType[]>([]);
     const [tabNumber, setTabNumber] = useState<string>();
-    const [equippedItems, setequippedItems] = useState<ItemType[]>([]);
-    const [itemIds, setItemIds] = useState<number[]>([])
+    const [items, setItems] = useState<ItemType[]>([]);
+    const [itemIds, setItemIds] = useState<itemIdType[]>([])
     const [err, setErr] = useState(false);
     const [slots, setSlots] = useState<{slot: string, item: number}[]>([]);
 
@@ -43,14 +43,16 @@ const Equipment = ({charName: charName} : {charName: string}) => {
     useEffect(() =>{
         fetchEquipmentTabs()
             return() => {
-                setequippedItems([]);
+                setItems([]);
                 setSlots([]);
                 setErr(false);
             }
     }, [tabNumber, setTabNumber])
-
+    const fetchProps = {
+        itemIds, setItems
+    }
     useEffect(() => {
-        useItemFetch(itemIds, setequippedItems);
+        useItemFetch(fetchProps);
     }, [itemIds, setItemIds])
     
     function fetchEquipmentTabs(){
@@ -62,8 +64,13 @@ const Equipment = ({charName: charName} : {charName: string}) => {
                 if (data.equipment.length === 0) {
                     setErr(true);
                 } else {
-                    data.equipment.map((item:any)=> {
-                        setItemIds(i => [...i, item.id]);
+                    data.equipment.map((item:any, index: number)=> {
+                        if (item) {
+                            const {id, count} = item;
+                            setItemIds(i => [...i, {id: id, i: index, count: count}]);
+                        } else {
+                            setItemIds(i => [...i, {id: 0, i: index}]); //I am using 0 as a placeholder for null values. I am going to place an empty icon there
+                        }
                         setSlots((i: any) => [...i, {slot:item.slot, item:item.id}])
                     });
                 }             
@@ -90,10 +97,10 @@ const Equipment = ({charName: charName} : {charName: string}) => {
                     </select>
                 </div>
 
-                {equippedItems && !err && <EquipmentLayout items={equippedItems} slots={slots}/>}
+                {items && !err && <EquipmentLayout items={items} slots={slots}/>}
             </>
             }
-            {!equippedItems.length && !err && <p style={{fontStyle:"italic", textAlign:"center"}}>Fetching your equipment...</p>}
+            {!items.length && !err && <p style={{fontStyle:"italic", textAlign:"center"}}>Fetching your equipment...</p>}
             {err && <p style={{textAlign:"center"}}>No items found</p>}
         </>
         
@@ -166,7 +173,7 @@ export const EquipmentLayout = ({items, slots} : EquipmentProp) =>{
             nextIcons[_slot.slot] = {image: <img    onMouseEnter={() => handleMouseEnter(i, setTopPos, setLeftPos)} 
                                                     onMouseLeave={() => handleMouseExit(i)} 
                                                     style={{border: `${borderColor} 2px solid`, width: "50px"}} src={_slot.item[0]?.icon}></img>,
-                                    description: <span id={String(i)}  className="inactiveCard" style={{position: "relative"}}> <ItemCard topPos={topPos} leftPos={leftPos} item={_slot.item[0]} styles={itemCardStyles}/> </span>};
+                                    description: <span id={String(i)}  className="inactiveCard" style={{position: "relative"}}> <ItemCard topPos={topPos} leftPos={leftPos} item={_slot.item[0]} /> </span>};
             })
             setIcons(nextIcons);
         }
