@@ -33,8 +33,20 @@ div.cardIcon > img{
     z-index: 20;
     background-color: rgba(0, 0, 0, 0.932);
     color: white;
+    
 }
-
+.topTrue{
+    top: -440;
+}
+.topFalse{
+    top: 0;
+}
+.leftTrue{
+    left: -310;
+}
+.leftFalse{
+    left: -10;
+}
 .cardStrength p, .cardDefense p{
     margin: 20px 0;
 }

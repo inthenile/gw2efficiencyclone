@@ -13,7 +13,7 @@ const BankInfo = ({data} : {data: any}) => {
     const [icons, setIcons] = useState<{[key: string]: any}>()
     const [leftPos, setLeftPos] = useState(0);
     const [topPos, setTopPos] = useState(0);
-    const [bankTab, setBankTab] = useState<{display: boolean, item: any[]}[]>([]);
+    const [bankTab, setBankTab] = useState<{display: boolean, item?: any[]}[]>([{display: true}]);
     useEffect(() =>{
         const slotAmount = 30; //this is the number of item slots that are available in a single bank tab.
         //therefore the amount of tab amount is data.length divided by 30.
@@ -53,11 +53,11 @@ const BankInfo = ({data} : {data: any}) => {
     }, [icons])
 
     function makeTabs(){
-        setBankTab([]);
-        if (icons?.length > 0) {
+        setBankTab([])
+        if (icons?.length > 0 ) {
             for (let i = 0; i < tabAmount.length; i++) {
                 const x = icons?.splice(0, 30);
-                setBankTab(t => [...t, {item: x, display: true}])
+                setBankTab(t => [...t, {item: x, display: bankTab[i]?.display}])
             }
         }
     }
@@ -72,19 +72,20 @@ const BankInfo = ({data} : {data: any}) => {
           }));
     }
 
-
     function handleIcons (){
-        const nextIcons: any[] = []
-        items && items.map((item, i) => {
-        const borderColor = findItemColor(item.rarity);
-        const x = { image: <img onMouseEnter={() => handleMouseEnter(i, setTopPos, setLeftPos)} 
-                            onMouseLeave={() => handleMouseExit(i)} 
-                            style={{border: `${borderColor} 2px solid`, width: "50px"}} src={item.icon}></img>, 
-                    count: <div className={styles.itemCount}>{item.count}</div>,
-                    description: <span id={String(i)}  className="inactiveCard" style={{position: "relative"}}> <ItemCard topPos={topPos} leftPos={leftPos} item={item} /> </span> }
-        nextIcons.push(x);
-        })
-        setIcons(nextIcons)
+        if (items) {
+            const nextIcons: any[] = []
+            items && items.map((item, i) => {
+            const borderColor = findItemColor(item.rarity);
+            const x = { image: <img onMouseEnter={() => handleMouseEnter(i, setTopPos, setLeftPos)} 
+                                onMouseLeave={() => handleMouseExit(i)} 
+                                style={{border: `${borderColor} 2px solid`, width: "50px"}} src={item.icon}></img>, 
+                        count: <div className={styles.itemCount}>{item.count}</div>,
+                        description: <span id={String(i)}  className="inactiveCard" style={{position: "relative"}}> <ItemCard topPos={topPos} leftPos={leftPos} item={item} /> </span> }
+            nextIcons.push(x);
+            setIcons(nextIcons)
+            })
+        }
     } 
     
     return ( 

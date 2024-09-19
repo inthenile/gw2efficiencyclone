@@ -19,9 +19,9 @@ This is an update to the initial <a href="https://github.com/inthenile/gw2api">G
 ![equipment](public/screenshots/equipment.png)
 
 # To-dos
-Might add material storage and wardrobe storage.
-Bosses, Crafting and Activities menus will 99% be removed.
-Stats page is most likely going to be dedicated to WvW related stuff.
-Like character equipments, charater builds MIGHT be added.
-Lottery page will remain just as a fun (essentially non-functional) page, just to keep the site more in line as a gw2efficiency clone.
+Might add material storage and wardrobe storage. <br/>
+Bosses, Crafting and Activities menus will 99% be removed. <br/>
+Stats page is most likely going to be dedicated to WvW related stuff. <br/>
+Like character equipments, charater builds MIGHT be added. <br/>
+Lottery page will remain just as a fun (essentially non-functional) page, just to keep the site more in line as a gw2efficiency clone. <br/>
 <s>For inventory/bank pages, I might add the amount of items as well.</s>
