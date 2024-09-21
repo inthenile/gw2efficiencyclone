@@ -5,18 +5,9 @@ export const accountInfo: EndpointType = {
     keyReq: true,
 }
 
-export function accountInfoFunction(data: any){
-    console.log(data);
-}
-
 export const wizVaultDaily: EndpointType = {
     url: "/v2/account/wizardsvault/daily",
     keyReq: true
-}
-
-export function wizVaultDailyFunction(data: any){
-    console.log(data);
-    
 }
 
 export const worldBosses: EndpointType = {
