@@ -13,7 +13,7 @@ const BankInfo = ({data} : {data: any}) => {
     const [icons, setIcons] = useState<{[key: string]: any}>()
     const [leftPos, setLeftPos] = useState(0);
     const [topPos, setTopPos] = useState(0);
-    const [bankTab, setBankTab] = useState<{display: boolean, item?: any[]}[]>([]);
+    const [bankTab, setBankTab] = useState<{display: boolean, item: any[]}[]>([]);
     useEffect(() =>{
         const slotAmount = 30; //this is the number of item slots that are available in a single bank tab.
         //therefore the amount of tab amount is data.length divided by 30.
