@@ -14,8 +14,10 @@ This is an update to the initial <a href="https://github.com/inthenile/gw2api">G
 
 # Screenshots
 Responsive design:
+<br />
 ![mobile responsive](public/screenshots/mobile_responsive.png)
 Examples:
+<br />
 ![api key window](public/screenshots/api_keys.png)
 ![equipment](public/screenshots/equipment.png)
 ![bank tabs](public/screenshots/banktabs.png)
